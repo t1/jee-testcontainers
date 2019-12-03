@@ -46,7 +46,7 @@ abstract class Deployable {
         @Getter private final String fileName;
 
         private FileDeployable(URI deployment) {
-            this.localPath = Paths.get(deployment);
+            this.localPath = (deployment.getScheme() == null) ? Paths.get(deployment.toString()) : Paths.get(deployment);
             this.fileName = fileName(deployment);
         }
     }

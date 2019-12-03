@@ -77,6 +77,16 @@ public class DeploymentBehavior {
 
     @Nested class LocalFileUrl {
         @Test void shouldGetDeploymentFromLocalFile() {
+            container.withDeployment("target/my-app.war");
+
+            assertThat(container.webContext()).isEqualTo("my-app");
+            assertThat(container.getCopyToFileContainerPathMap())
+                .containsValues("/opt/wildfly/standalone/deployments/my-app.war");
+            assertThat(getMountableFile().getResolvedPath())
+                .isEqualTo(System.getProperty("user.dir") + "/target/my-app.war");
+        }
+
+        @Test void shouldGetDeploymentFromLocalFileUrl() {
             container.withDeployment("file://" + JolokiaData.LOCAL_M2);
 
             assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured");
