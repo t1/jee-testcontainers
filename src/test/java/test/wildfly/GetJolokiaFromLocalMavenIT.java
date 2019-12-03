@@ -18,6 +18,8 @@ public class GetJolokiaFromLocalMavenIT {
 
     @Test void shouldGetJolokiaResponse() {
         String string = CONTAINER.target().request(APPLICATION_JSON_TYPE).get(String.class);
+
+
         JolokiaResponse response = JsonbBuilder.create().fromJson(string, JolokiaResponse.class);
 
         response.assertCurrent();

@@ -1,0 +1,26 @@
+= JEE Testcontainers
+
+Simply start and stop Jakarta EE containers in Docker for your integration tests. This is an extension to https://testcontainers.org[Testcontainers] for Jakarta EE application servers.
+
+Prototypical Example:
+
+[source,java]
+---------------------------------------------------------------
+@Testcontainers
+public class MyAppIT {
+    @Container static JeeContainer CONTAINER = JeeContainer.create()
+        .withDeployment("target/my-app.war");
+
+    @Test void shouldGetJolokiaResponse() {
+        String body = CONTAINER.target().request(APPLICATION_JSON_TYPE).get(String.class);
+
+        assertThat(body).isEqualTo("{\"status\":\"okay\"}");
+    }
+}
+---------------------------------------------------------------
+
+Instead of a local file, you can also install from URLs. Note that the name of web context may be derived from the file name, e.g., a file `example.war` may be reachable as `http://localhost:8080/example/...`. So if the file name includes a version, this may result in a web context including the version, which is often not what you'll want. There is a simple heuristic of stripping a standard https://semver.org[semver] version like `example-1.12.5-SNAPSHOT.war`, but this heuristic is very limited.
+
+Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`. Note that the file already has to be downloaded manually to you local maven repository... I plan to fix that.
+
+Currently only https://wildfly.org[WildFly] containers are supported (uses `quay.io/wildfly/wildfly-centos7`), but it should be quite straight forward to extend it to other containers. Pull request are warmly welcome; but if you open an issue, I may find the time to add another container, too.
