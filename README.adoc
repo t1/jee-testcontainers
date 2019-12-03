@@ -21,6 +21,8 @@ public class MyAppIT {
 }
 ---------------------------------------------------------------
 
+The console output of the container is piped to the test's output, STDOUT in green and STDERR in blue.
+
 Instead of a local file, you can also install from URLs. Note that the name of web context may be derived from the file name, e.g., a file `example.war` may be reachable as `http://localhost:8080/example/...`. So if the file name includes a version, this may result in a web context including the version, which is often not what you'll want. There is a simple heuristic of stripping a standard https://semver.org[semver] version like `example-1.12.5-SNAPSHOT.war`, but this heuristic is very limited.
 
 Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`. Note that the file already has to be downloaded manually to you local maven repository... I plan to fix that.

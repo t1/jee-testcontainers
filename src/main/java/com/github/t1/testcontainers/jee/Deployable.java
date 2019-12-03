@@ -46,10 +46,12 @@ abstract class Deployable {
         @Getter private final String fileName;
 
         private FileDeployable(URI deployment) {
-            this.localPath = (deployment.getScheme() == null) ? Paths.get(deployment.toString()) : Paths.get(deployment);
+            this.localPath = (deployment.getScheme() == null)
+                ? Paths.get(deployment.toString()) : Paths.get(deployment);
             this.fileName = fileName(deployment);
         }
     }
+
 
     private static class UrnDeployable extends Deployable {
         private final String groupId;
@@ -90,6 +92,7 @@ abstract class Deployable {
         }
     }
 
+
     private static class UrlDeployable extends Deployable {
         private final URI deployment;
         @Getter private final String fileName;
@@ -120,7 +123,7 @@ abstract class Deployable {
         }
     }
 
-    static String fileName(URI uri) {
+    private static String fileName(URI uri) {
         Path path = Paths.get(uri.getSchemeSpecificPart());
         String fileName = path.getFileName().toString();
         Matcher matcher = FILE_NAME_PATTERN.matcher(fileName);
