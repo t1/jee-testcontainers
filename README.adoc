@@ -1,4 +1,5 @@
 = JEE Testcontainers
+image::https://api.bintray.com/packages/t1/javaee-helpers/jee-testcontainers/images/download.svg[link="https://bintray.com/t1/javaee-helpers/jee-testcontainers/_latestVersion"]
 
 Simply start and stop Jakarta EE containers in Docker for your integration tests. This is an extension to https://testcontainers.org[Testcontainers] for Jakarta EE application servers.
 
