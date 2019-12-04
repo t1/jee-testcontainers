@@ -1,5 +1,6 @@
 package com.github.t1.testcontainers.jee;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.testcontainers.containers.GenericContainer;
@@ -20,12 +21,13 @@ import java.net.URI;
 @Slf4j
 public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     static final Client CLIENT = ClientBuilder.newClient();
-    private String containerDeploymentPath;
 
     public static JeeContainer create() {
         // TODO switch to other containers via system properties
         return new WildflyContainer();
     }
+
+    @Setter private String containerDeploymentPath;
 
     public JeeContainer(String dockerImageName) {
         super(dockerImageName);
@@ -44,11 +46,6 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         this.deployable = Deployable.create(deployable);
         withCopyFileToContainer(MountableFile.forHostPath(this.deployable.getLocalPath()),
             containerDeploymentPath + this.deployable.getFileName());
-        return self();
-    }
-
-    public JeeContainer withContainerDeploymentPath(String containerDeploymentPath) {
-        this.containerDeploymentPath = containerDeploymentPath;
         return self();
     }
 

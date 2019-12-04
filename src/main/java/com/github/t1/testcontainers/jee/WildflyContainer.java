@@ -8,7 +8,7 @@ public class WildflyContainer extends JeeContainer {
     public WildflyContainer() {
         // TODO use different versions via system property
         super("quay.io/wildfly/wildfly-centos7");
-        withContainerDeploymentPath("/opt/wildfly/standalone/deployments/");
+        setContainerDeploymentPath("/opt/wildfly/standalone/deployments/");
         addExposedPort(8080);
         waitingFor(new LogMessageWaitStrategy().withRegEx(WAR_DEPLOYED_MESSAGE));
     }
