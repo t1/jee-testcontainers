@@ -13,12 +13,14 @@ import java.net.URI;
 /**
  * Testcontainer for Jakarta EE application servers.
  * The {@link #create()} is used to build instances configured by system properties.
+ * Subclasses must expose at least one port, but when they expose multiple ports,
+ * only the {@link #getFirstMappedPort() first port} is used for the {@link #baseUri()}.
  */
 // we don't use the SELF type, as we don't want any JEE container specific config
 @Slf4j
 public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     static final Client CLIENT = ClientBuilder.newClient();
-    private static final int EXPOSED_PORT = 8080;
+    private String containerDeploymentPath;
 
     public static JeeContainer create() {
         // TODO switch to other containers via system properties
@@ -27,7 +29,6 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
 
     public JeeContainer(String dockerImageName) {
         super(dockerImageName);
-        addExposedPort(EXPOSED_PORT);
         withLogConsumer(new StdoutLogConsumer());
         // TODO health wait strategy
         // TODO keep running
@@ -42,18 +43,21 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     public JeeContainer withDeployment(URI deployable) {
         this.deployable = Deployable.create(deployable);
         withCopyFileToContainer(MountableFile.forHostPath(this.deployable.getLocalPath()),
-            containerPath() + this.deployable.getFileName());
+            containerDeploymentPath + this.deployable.getFileName());
         return self();
     }
 
-    @NotNull protected abstract String containerPath();
+    public JeeContainer withContainerDeploymentPath(String containerDeploymentPath) {
+        this.containerDeploymentPath = containerDeploymentPath;
+        return self();
+    }
 
     public WebTarget target() {
         return CLIENT.target(baseUri());
     }
 
     public URI baseUri() {
-        return URI.create("http://" + getContainerIpAddress() + ":" + getMappedPort(EXPOSED_PORT) + "/" + webContext());
+        return URI.create("http://" + getContainerIpAddress() + ":" + getFirstMappedPort() + "/" + webContext());
     }
 
     public String webContext() {
