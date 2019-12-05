@@ -29,6 +29,8 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
                 return new OpenLibertyContainer();
             case "tomee":
                 return new TomEeContainer();
+            case "payara":
+                return new PayaraContainer();
             default:
                 throw new IllegalArgumentException("unsupported container type '"
                     + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
@@ -78,7 +80,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     }
 
     public URI baseUri() {
-        return URI.create("http://" + getContainerIpAddress() + ":" + getFirstMappedPort() + "/" + webContext());
+        return URI.create("http://" + getContainerIpAddress() + ":" + getFirstMappedPort() + "/" + webContext() + "/");
     }
 
     public String webContext() {

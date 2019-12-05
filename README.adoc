@@ -41,7 +41,7 @@ You can append a tag to the `jee-testcontainer` separated by a colon `:`. This i
 | `wildfly` | https://wildfly.org[WildFly] | https://quay.io/repository/wildfly/wildfly-centos7[`quay.io/wildfly/wildfly-centos7`] | default container
 | `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] |
 | `tomee` | https://tomee.apache.org[TomEE] | https://hub.docker.com/_/tomee[`tomee`] |
-// TODO support | `payara` | https://www.payara.fish[Payara] | https://hub.docker.com/r/payara/server-full[`payara`] | not an official image
+| `payara` | https://www.payara.fish[Payara] | https://hub.docker.com/r/payara/server-full[`payara`] | not an 'official' image
 // TODO support | `glassfish` | https://javaee.github.io/glassfish/[Glassfish] | https://hub.docker.com/_/glassfish[`glassfish`] | deprecated image!
 |=======================
 

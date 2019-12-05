@@ -2,6 +2,7 @@ package test.unit;
 
 import com.github.t1.testcontainers.jee.JeeContainer;
 import com.github.t1.testcontainers.jee.OpenLibertyContainer;
+import com.github.t1.testcontainers.jee.PayaraContainer;
 import com.github.t1.testcontainers.jee.TomEeContainer;
 import com.github.t1.testcontainers.jee.WildflyContainer;
 import org.junit.jupiter.api.Nested;
@@ -62,6 +63,14 @@ public class JeeContainerBehavior {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(TomEeContainer.class);
+            });
+        }
+
+        @Test void shouldSelectPayaraBySystemProperty() {
+            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "payara", () -> {
+                JeeContainer container = JeeContainer.create();
+
+                assertThat(container).isInstanceOf(PayaraContainer.class);
             });
         }
 
