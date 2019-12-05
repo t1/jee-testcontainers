@@ -11,8 +11,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.github.t1.testcontainers.jee.JeeContainer.CLIENT;
 import static javax.ws.rs.core.Response.Status.OK;
@@ -125,13 +123,6 @@ abstract class Deployable {
 
     private static String fileName(URI uri) {
         Path path = Paths.get(uri.getSchemeSpecificPart());
-        String fileName = path.getFileName().toString();
-        Matcher matcher = FILE_NAME_PATTERN.matcher(fileName);
-        if (matcher.matches())
-            return matcher.group("filename") + matcher.group("extension");
-        return fileName;
+        return path.getFileName().toString();
     }
-
-    private static final Pattern FILE_NAME_PATTERN = Pattern.compile(
-        "(?<filename>.*?)-(?<version>\\d+\\.\\d+\\.\\d+(-SNAPSHOT)?)(?<extension>\\.\\w{1,4})");
 }

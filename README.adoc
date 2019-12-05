@@ -2,7 +2,7 @@
 
 image::https://api.bintray.com/packages/t1/javaee-helpers/jee-testcontainers/images/download.svg[link="https://bintray.com/t1/javaee-helpers/jee-testcontainers/_latestVersion"]
 
-Simply start and stop Jakarta EE containers in Docker for your integration tests. This is an extension to https://testcontainers.org[Testcontainers] for Jakarta EE application servers.
+Simply start and stop Jakarta EE containers and deploy applications for your integration tests. This is an extension to https://testcontainers.org[Testcontainers] for Jakarta EE application servers, so Docker is used under the hood, but you don't need to write, e.g., a Dockerfile.
 
 Prototypical Example:
 
@@ -27,10 +27,24 @@ The console output of the container is piped to the test's output, STDOUT in gre
 
 As seen in the prototypical example above, you can install an application by calling `.withDeployment(<file>)`.
 
-Instead of a local file, you can also install from URLs. Note that the name of web context may be derived from the file name, e.g., a file `example.war` may be reachable as `http://localhost:8080/example/...`. So if the file name includes a version, this may result in a web context including the version, which is often not what you'll want. There is a simple heuristic of stripping a standard https://semver.org[semver] version like `example-1.12.5-SNAPSHOT.war`, but this heuristic is very limited.
+Instead of a local file, you can also install from an URL. Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`. Note that in this case, the file already has to be downloaded manually to you local maven repository... I plan to fix that; tell me if you need it.
 
-Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`. Note that the file already has to be downloaded manually to you local maven repository... I plan to fix that.
+== Configuration
 
-== Servers
+Set the system property `jee-testcontainer` to one of the following keys to select the corresponding container.
 
-Currently only https://wildfly.org[WildFly] containers are supported (uses `quay.io/wildfly/wildfly-centos7`), but it should be quite straight forward to extend it to other containers. Pull request are warmly welcome; but if you open an issue, I may find the time to add another container, too.
+[options="header",cols="15%,15%,40%,30%"]
+|=======================
+| Key | Container | Docker Image | Notes
+| wildfly | https://wildfly.org[WildFly] | `quay.io/wildfly/wildfly-centos7` | default
+| open-liberty | https://openliberty.io[Open Liberty] | `open-liberty` from Docker Hub |
+// TODO support | tom-ee |  |  |
+// TODO support | payara |  |  |
+// TODO support | glassfish |  |  |
+|=======================
+
+It's quite straight forward to support other containers. It's even easier to make the images or versions (tags) configurable. Pull request are warmly welcome, but even if you just open an issue, I may find the time, too.
+
+// TODO health wait strategy
+// TODO use different images or versions/tags via system property
+// TODO actually do the mvn download instead: mvn dependency:get -Dartifact=org.jolokia:jolokia-war:1.3.7:war

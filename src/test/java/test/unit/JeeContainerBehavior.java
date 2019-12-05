@@ -1,6 +1,8 @@
-package test.wildfly;
+package test.unit;
 
 import com.github.t1.testcontainers.jee.JeeContainer;
+import com.github.t1.testcontainers.jee.OpenLibertyContainer;
+import com.github.t1.testcontainers.jee.WildflyContainer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.utility.MountableFile;
@@ -9,8 +11,63 @@ import test.jolokia.JolokiaData;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-public class DeploymentBehavior {
+public class JeeContainerBehavior {
     private final JeeContainer container = JeeContainer.create();
+
+    @Nested class General {
+        @Test void shouldFailToGetTargetWhenContainerIsNotStarted() {
+            Throwable throwable = catchThrowable(container::target);
+
+            assertThat(throwable)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Container is not started.");
+        }
+    }
+
+    @Nested class ContainerSelection {
+        @Test void shouldSelectWildflyByDefault() {
+            assertThat(container).isInstanceOf(WildflyContainer.class);
+        }
+
+        @Test void shouldSelectWildflyBySystemProperty() {
+            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "wildfly", () -> {
+                JeeContainer container = JeeContainer.create();
+
+                assertThat(container).isInstanceOf(WildflyContainer.class);
+            });
+        }
+
+        @Test void shouldSelectOpenLibertyBySystemProperty() {
+            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "open-liberty", () -> {
+                JeeContainer container = JeeContainer.create();
+
+                assertThat(container).isInstanceOf(OpenLibertyContainer.class);
+            });
+        }
+
+        @Test void shouldFailToSelectUnknownContainerBySystemProperty() {
+            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "unknown", () -> {
+                Throwable throwable = catchThrowable(JeeContainer::create);
+
+                assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("unsupported container type 'unknown'");
+            });
+        }
+    }
+
+    private static void withSystemProperty(String property, String value, Runnable block) {
+        String oldValue = System.getProperty(property);
+        System.setProperty(property, value);
+        try {
+            block.run();
+        } finally {
+            if (oldValue == null) {
+                System.clearProperty(property);
+            } else {
+                System.setProperty(property, oldValue);
+            }
+        }
+    }
 
     @Nested class MavenUrn {
         @Test void shouldGetDeploymentFromMavenUrn() {
@@ -51,7 +108,6 @@ public class DeploymentBehavior {
 
             assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("maven artifact is not downloaded to local repository");
-            // TODO actually do the download instead by calling the Maven cli
         }
     }
 
@@ -59,9 +115,9 @@ public class DeploymentBehavior {
         @Test void shouldGetDeploymentFromMavenCentralUrl() {
             container.withDeployment("https://repo1.maven.org/maven2" + JolokiaData.REPO_PATH);
 
-            assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(JolokiaData.TARGET_PATH);
-            assertThat(getMountableFile().getResolvedPath()).endsWith("/jolokia-war-unsecured.war");
+            assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured-" + JolokiaData.VERSION);
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(JolokiaData.TARGET_PATH_V);
+            assertThat(getMountableFile().getResolvedPath()).endsWith(JolokiaData.WAR_V);
         }
 
         @Test void shouldFailToGetDeploymentFromMavenUrnNotDownloadable() {
@@ -72,7 +128,6 @@ public class DeploymentBehavior {
             assertThat(throwable).isInstanceOf(IllegalStateException.class)
                 .hasMessage("can't download " + url + ": 404 Not Found");
         }
-
     }
 
     @Nested class LocalFileUrl {
@@ -89,8 +144,8 @@ public class DeploymentBehavior {
         @Test void shouldGetDeploymentFromLocalFileUrl() {
             container.withDeployment("file://" + JolokiaData.LOCAL_M2);
 
-            assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(JolokiaData.TARGET_PATH);
+            assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured-1.6.2");
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(JolokiaData.TARGET_PATH_V);
             assertThat(getMountableFile().getResolvedPath()).isEqualTo(JolokiaData.LOCAL_M2);
         }
 
@@ -105,8 +160,8 @@ public class DeploymentBehavior {
         @Test void shouldGetDeploymentFromLocalSnapshotFile() {
             container.withDeployment("file:///foo/bar-12.14.17345-SNAPSHOT.war");
 
-            assertThat(container.webContext()).isEqualTo("bar");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/wildfly/standalone/deployments/bar.war");
+            assertThat(container.webContext()).isEqualTo("bar-12.14.17345-SNAPSHOT");
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/wildfly/standalone/deployments/bar-12.14.17345-SNAPSHOT.war");
             assertThat(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar-12.14.17345-SNAPSHOT.war");
         }
     }

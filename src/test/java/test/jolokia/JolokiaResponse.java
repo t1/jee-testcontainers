@@ -11,7 +11,5 @@ public class JolokiaResponse {
     public void assertCurrent() {
         assertThat(value.getAgent()).isEqualTo(JolokiaData.VERSION);
         assertThat(value.getProtocol()).isEqualTo("7.2");
-        assertThat(value.getInfo().getProduct()).isEqualTo("WildFly Full");
-        assertThat(value.getInfo().getVendor()).isEqualTo("RedHat");
     }
 }
