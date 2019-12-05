@@ -31,7 +31,7 @@ Instead of a local file, you can also install from an URL. Or you can use a mave
 
 == Configuration
 
-Set the system property `jee-testcontainer` to one of the following keys to select the corresponding container.
+Set the system property `jee-testcontainer` to one of the following keys to select the corresponding container. Ideally you shouldn't have to care about what server your application runs on, or you may even want to test it in multiple containers. Then you can run your test suite in your CI pipeline with different system properties.
 
 [options="header",cols="15%,15%,40%,30%"]
 |=======================
@@ -48,3 +48,7 @@ It's quite straight forward to support other containers. It's even easier to mak
 // TODO health wait strategy
 // TODO use different images or versions/tags via system property
 // TODO actually do the mvn download instead: mvn dependency:get -Dartifact=org.jolokia:jolokia-war:1.3.7:war
+
+== Limitations
+
+You can't currently configure your application, e.g. by adding data sources. I will add that when I need it, which may be very soon ;-)
