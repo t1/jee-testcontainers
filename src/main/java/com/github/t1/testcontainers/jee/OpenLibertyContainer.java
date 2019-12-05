@@ -16,14 +16,19 @@ public class OpenLibertyContainer extends JeeContainer {
     private static final String SERVER_PATH = "/opt/ol/wlp/usr/servers/defaultServer";
     public static final String APPS_PATH = SERVER_PATH + "/apps/";
 
-    private final Path serverXml;
+    private final Path serverXml = tempServerXml();
 
     @SneakyThrows(IOException.class)
-    public OpenLibertyContainer() {
-        super("open-liberty");
+    private static Path tempServerXml() {
+        return Files.createTempDirectory(null).resolve("server.xml");
+    }
+
+    public OpenLibertyContainer() { this(null); }
+
+    public OpenLibertyContainer(String tag) {
+        super(tagged("open-liberty", tag));
         setContainerDeploymentPath(APPS_PATH);
         addExposedPort(9080);
-        serverXml = Files.createTempDirectory(null).resolve("server.xml");
         withCopyFileToContainer(MountableFile.forHostPath(serverXml), SERVER_PATH + "/server.xml");
         waitingFor(new LogMessageWaitStrategy().withRegEx(".*CWWKZ0001I: Application .* started.*"));
     }
@@ -32,11 +37,8 @@ public class OpenLibertyContainer extends JeeContainer {
     @Override public JeeContainer withDeployment(URI deployable) {
         super.withDeployment(deployable);
         Files.copy(OpenLibertyContainer.class.getResourceAsStream("/openliberty_server.xml"), serverXml);
-        Files.write(serverXml, ("    <application"
-            + " id=\"app_war\""
-            + " type=\"war\""
-            + " location=\"" + containerPath() + "\""
-            + " context-root=\"/" + webContext() + "\" />\n"
+        Files.write(serverXml, (""
+            + "    <application id=\"app_war\" type=\"war\" location=\"" + containerPath() + "\" context-root=\"/" + webContext() + "\" />\n"
             + "</server>\n").getBytes(UTF_8), APPEND);
         return self();
     }

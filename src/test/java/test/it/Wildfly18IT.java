@@ -14,8 +14,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
-public class WildflyIT {
-    @Container static JeeContainer CONTAINER = new WildflyContainer()
+public class Wildfly18IT {
+    @Container static JeeContainer CONTAINER = new WildflyContainer("18.0")
         .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + JolokiaData.VERSION + ":war");
 
     @Test void shouldGetJolokiaResponse() {
@@ -25,5 +25,6 @@ public class WildflyIT {
         response.assertCurrent();
         assertThat(response.getValue().getInfo().getProduct()).isEqualTo("WildFly Full");
         assertThat(response.getValue().getInfo().getVendor()).isEqualTo("RedHat");
+        assertThat(response.getValue().getInfo().getVersion()).isEqualTo("18.0.0.Final");
     }
 }

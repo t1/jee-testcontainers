@@ -10,4 +10,5 @@
     </root>
     <logger name="org.testcontainers.containers.output" level="INFO"/>
     <logger name="org.jboss.resteasy.resteasy_jaxrs.i18n" level="INFO"/>
+    <logger name="com.github.dockerjava.core.command.PullImageResultCallback" level="INFO"/>
 </configuration>

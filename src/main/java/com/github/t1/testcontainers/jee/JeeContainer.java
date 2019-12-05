@@ -12,15 +12,8 @@ import java.net.URI;
 
 /**
  * Testcontainer for Jakarta EE application servers.
- * Use {@link #create()} to build instances. Configure them by system properties:
- * <ul>
- * <li>Set `jee-testcontainer` to `wildfly` or `open-liberty` to select the corresponding container.</li>
- * </ul>
- * <p>
- * Subclasses must expose at least one port, but when they expose multiple ports,
- * only the {@link #getFirstMappedPort() first port} is used for the {@link #baseUri()}.
  *
- * @see <a href="https://www.testcontainers.org">https://www.testcontainers.org</a>
+ * @see <a href="https://github.com/t1/jee-testcontainers">https://github.com/t1/jee-testcontainers</a>
  */
 // we don't use the SELF type, as we don't want any JEE container specific config
 @Slf4j
@@ -29,7 +22,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     public static final String CONTAINER_SELECTOR_PROPERTY = "jee-testcontainer";
 
     public static JeeContainer create() {
-        switch (System.getProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly")) {
+        switch (containerKey()) {
             case "wildfly":
                 return new WildflyContainer();
             case "open-liberty":
@@ -40,14 +33,26 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         }
     }
 
+    private static String containerKey() { return containerSelector()[0]; }
+
+    private static String containerTag() { return containerSelector().length == 1 ? null : containerSelector()[1]; }
+
+    private static String[] containerSelector() {
+        return System.getProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly").split(":", 2);
+    }
+
     @Setter private String containerDeploymentPath;
 
-    public JeeContainer(String dockerImageName) {
-        super(dockerImageName);
+    private Deployable deployable;
+
+    public JeeContainer(String image) {
+        super(tagged(image, containerTag()));
         withLogConsumer(new StdoutLogConsumer());
     }
 
-    private Deployable deployable;
+    protected static String tagged(String image, String tag) {
+        return (tag == null) ? image : (image + ":" + tag);
+    }
 
     public JeeContainer withDeployment(String deployableString) {
         return withDeployment(URI.create(deployableString));

@@ -10,6 +10,7 @@ import test.jolokia.JolokiaData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static test.TestTools.withSystemProperty;
 
 public class JeeContainerBehavior {
     private final JeeContainer container = JeeContainer.create();
@@ -52,20 +53,6 @@ public class JeeContainerBehavior {
                 assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("unsupported container type 'unknown'");
             });
-        }
-    }
-
-    private static void withSystemProperty(String property, String value, Runnable block) {
-        String oldValue = System.getProperty(property);
-        System.setProperty(property, value);
-        try {
-            block.run();
-        } finally {
-            if (oldValue == null) {
-                System.clearProperty(property);
-            } else {
-                System.setProperty(property, oldValue);
-            }
         }
     }
 
