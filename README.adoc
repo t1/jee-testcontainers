@@ -40,17 +40,16 @@ You can append a tag to the `jee-testcontainer` separated by a colon `:`. This i
 | Key | Container | Docker Image | Notes
 | `wildfly` | https://wildfly.org[WildFly] | https://quay.io/repository/wildfly/wildfly-centos7[`quay.io/wildfly/wildfly-centos7`] | default container
 | `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] |
-// TODO support | tom-ee |  |  |
-// TODO support | payara |  |  |
-// TODO support | glassfish |  |  |
+| `tomee` | https://tomee.apache.org[TomEE] | https://hub.docker.com/_/tomee[`tomee`] |
+// TODO support | `payara` | https://www.payara.fish[Payara] | https://hub.docker.com/r/payara/server-full[`payara`] | not an official image
+// TODO support | `glassfish` | https://javaee.github.io/glassfish/[Glassfish] | https://hub.docker.com/_/glassfish[`glassfish`] | deprecated image!
 |=======================
-
-It's quite straight forward to support other containers. It's even easier to make the images or versions (tags) configurable. Pull request are warmly welcome, but even if you just open an issue, I may find the time, too.
-
-// TODO health wait strategy
-// TODO use different images or versions/tags via system property
-// TODO actually do the mvn download instead: mvn dependency:get -Dartifact=org.jolokia:jolokia-war:1.3.7:war
 
 == Limitations
 
-You can't currently configure your application, e.g. by adding data sources. I will add that when I need it, which may be very soon ;-)
+You can't currently configure your application, e.g. by adding data sources.
+I will add that when I need it, which may be very soon ;-)
+
+// TODO health wait strategy
+// TODO actually do the mvn download instead: mvn dependency:get -Dartifact=org.jolokia:jolokia-war:1.3.7:war
+// TODO configure config values, data sources, message queues, loggers, etc.

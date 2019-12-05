@@ -2,6 +2,7 @@ package test.unit;
 
 import com.github.t1.testcontainers.jee.JeeContainer;
 import com.github.t1.testcontainers.jee.OpenLibertyContainer;
+import com.github.t1.testcontainers.jee.TomEeContainer;
 import com.github.t1.testcontainers.jee.WildflyContainer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,16 @@ public class JeeContainerBehavior {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(WildflyContainer.class);
+                assertThat(container.getDockerImageName()).isEqualTo("quay.io/wildfly/wildfly-centos7:latest");
+            });
+        }
+
+        @Test void shouldSelectVersionBySystemProperty() {
+            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "wildfly:18.0", () -> {
+                JeeContainer container = JeeContainer.create();
+
+                assertThat(container).isInstanceOf(WildflyContainer.class);
+                assertThat(container.getDockerImageName()).isEqualTo("quay.io/wildfly/wildfly-centos7:18.0");
             });
         }
 
@@ -43,6 +54,14 @@ public class JeeContainerBehavior {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(OpenLibertyContainer.class);
+            });
+        }
+
+        @Test void shouldSelectTomEeBySystemProperty() {
+            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "tomee", () -> {
+                JeeContainer container = JeeContainer.create();
+
+                assertThat(container).isInstanceOf(TomEeContainer.class);
             });
         }
 

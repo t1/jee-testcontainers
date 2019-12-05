@@ -27,6 +27,8 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
                 return new WildflyContainer();
             case "open-liberty":
                 return new OpenLibertyContainer();
+            case "tomee":
+                return new TomEeContainer();
             default:
                 throw new IllegalArgumentException("unsupported container type '"
                     + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
