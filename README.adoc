@@ -38,7 +38,7 @@ You can append a tag to the `jee-testcontainer` separated by a colon `:`. This i
 [options="header",cols="15%,15%,40%,30%"]
 |=======================
 | Key | Container | Docker Image | Notes
-| `wildfly` | https://wildfly.org[WildFly] | jboss/wildfly[`jboss/wildfly`] | default container, not an 'official' image
+| `wildfly` | https://wildfly.org[WildFly] | https://hub.docker.com/r/jboss/wildfly[`jboss/wildfly`] | default container, not an 'official' image
 | `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] |
 | `tomee` | https://tomee.apache.org[TomEE] | https://hub.docker.com/_/tomee[`tomee`] |
 | `payara` | https://www.payara.fish[Payara] | https://hub.docker.com/r/payara/server-full[`payara`] | not an 'official' image
