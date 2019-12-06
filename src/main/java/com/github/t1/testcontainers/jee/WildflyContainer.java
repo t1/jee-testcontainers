@@ -8,8 +8,8 @@ public class WildflyContainer extends JeeContainer {
     public WildflyContainer() { this(null); }
 
     public WildflyContainer(String tag) {
-        super(tagged("quay.io/wildfly/wildfly-centos7", tag));
-        setContainerDeploymentPath("/opt/wildfly/standalone/deployments/");
+        super(tagged("jboss/wildfly", tag));
+        setContainerDeploymentPath("/opt/jboss/wildfly/standalone/deployments/");
         addExposedPort(8080);
         waitingFor(new LogMessageWaitStrategy().withRegEx(WAR_DEPLOYED_MESSAGE));
     }

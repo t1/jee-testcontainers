@@ -8,11 +8,17 @@ import com.github.t1.testcontainers.jee.WildflyContainer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.utility.MountableFile;
-import test.jolokia.JolokiaData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static test.TestTools.withSystemProperty;
+import static test.jolokia.TestData.LOCAL_M2;
+import static test.jolokia.TestData.REPO_PATH;
+import static test.jolokia.TestData.STANDALONE_DEPLOYMENTS;
+import static test.jolokia.TestData.TARGET_PATH;
+import static test.jolokia.TestData.TARGET_PATH_V;
+import static test.jolokia.TestData.VERSION;
+import static test.jolokia.TestData.WAR_V;
 
 public class JeeContainerBehavior {
     private final JeeContainer container = JeeContainer.create();
@@ -37,16 +43,16 @@ public class JeeContainerBehavior {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(WildflyContainer.class);
-                assertThat(container.getDockerImageName()).isEqualTo("quay.io/wildfly/wildfly-centos7:latest");
+                assertThat(container.getDockerImageName()).isEqualTo("jboss/wildfly:latest");
             });
         }
 
         @Test void shouldSelectVersionBySystemProperty() {
-            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "wildfly:18.0", () -> {
+            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "wildfly:18.0.1.Final", () -> {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(WildflyContainer.class);
-                assertThat(container.getDockerImageName()).isEqualTo("quay.io/wildfly/wildfly-centos7:18.0");
+                assertThat(container.getDockerImageName()).isEqualTo("jboss/wildfly:18.0.1.Final");
             });
         }
 
@@ -86,16 +92,16 @@ public class JeeContainerBehavior {
 
     @Nested class MavenUrn {
         @Test void shouldGetDeploymentFromMavenUrn() {
-            container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + JolokiaData.VERSION + ":war");
+            container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
 
             assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(JolokiaData.TARGET_PATH);
-            assertThat(getMountableFile().getResolvedPath()).isEqualTo(JolokiaData.LOCAL_M2);
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            assertThat(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2);
         }
 
         @Test void shouldFailToGetDeploymentFromNonMavenUrn() {
             Throwable throwable = catchThrowable(() ->
-                container.withDeployment("urn:xxx:org.jolokia:jolokia-war-unsecured:" + JolokiaData.VERSION + ":war"));
+                container.withDeployment("urn:xxx:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war"));
 
             assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("unsupported urn scheme 'xxx'");
@@ -103,7 +109,7 @@ public class JeeContainerBehavior {
 
         @Test void shouldFailToGetDeploymentFromMavenUrnWithoutType() {
             Throwable throwable = catchThrowable(() ->
-                container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + JolokiaData.VERSION));
+                container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION));
 
             assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("expected exactly 5 elements in 'mvn' urn");
@@ -111,7 +117,7 @@ public class JeeContainerBehavior {
 
         @Test void shouldFailToGetDeploymentFromMavenUrnWithExtraElement() {
             Throwable throwable = catchThrowable(() ->
-                container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + JolokiaData.VERSION + ":war:xxx"));
+                container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war:xxx"));
 
             assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("expected exactly 5 elements in 'mvn' urn");
@@ -128,11 +134,11 @@ public class JeeContainerBehavior {
 
     @Nested class MavenCentralUrl {
         @Test void shouldGetDeploymentFromMavenCentralUrl() {
-            container.withDeployment("https://repo1.maven.org/maven2" + JolokiaData.REPO_PATH);
+            container.withDeployment("https://repo1.maven.org/maven2" + REPO_PATH);
 
-            assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured-" + JolokiaData.VERSION);
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(JolokiaData.TARGET_PATH_V);
-            assertThat(getMountableFile().getResolvedPath()).endsWith(JolokiaData.WAR_V);
+            assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured-" + VERSION);
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH_V);
+            assertThat(getMountableFile().getResolvedPath()).endsWith(WAR_V);
         }
 
         @Test void shouldFailToGetDeploymentFromMavenUrnNotDownloadable() {
@@ -150,25 +156,23 @@ public class JeeContainerBehavior {
             container.withDeployment("target/my-app.war");
 
             assertThat(container.webContext()).isEqualTo("my-app");
-            assertThat(container.getCopyToFileContainerPathMap())
-                .containsValues("/opt/wildfly/standalone/deployments/my-app.war");
-            assertThat(getMountableFile().getResolvedPath())
-                .isEqualTo(System.getProperty("user.dir") + "/target/my-app.war");
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/my-app.war");
+            assertThat(getMountableFile().getResolvedPath()).isEqualTo(System.getProperty("user.dir") + "/target/my-app.war");
         }
 
         @Test void shouldGetDeploymentFromLocalFileUrl() {
-            container.withDeployment("file://" + JolokiaData.LOCAL_M2);
+            container.withDeployment("file://" + LOCAL_M2);
 
             assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured-1.6.2");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(JolokiaData.TARGET_PATH_V);
-            assertThat(getMountableFile().getResolvedPath()).isEqualTo(JolokiaData.LOCAL_M2);
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH_V);
+            assertThat(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2);
         }
 
         @Test void shouldGetDeploymentFromLocalFileWithoutVersion() {
             container.withDeployment("file:///foo/bar.war");
 
             assertThat(container.webContext()).isEqualTo("bar");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/wildfly/standalone/deployments/bar.war");
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/bar.war");
             assertThat(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar.war");
         }
 
@@ -176,7 +180,7 @@ public class JeeContainerBehavior {
             container.withDeployment("file:///foo/bar-12.14.17345-SNAPSHOT.war");
 
             assertThat(container.webContext()).isEqualTo("bar-12.14.17345-SNAPSHOT");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/wildfly/standalone/deployments/bar-12.14.17345-SNAPSHOT.war");
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/bar-12.14.17345-SNAPSHOT.war");
             assertThat(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar-12.14.17345-SNAPSHOT.war");
         }
     }
