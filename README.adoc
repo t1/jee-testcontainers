@@ -49,6 +49,9 @@ This is often simply the version of the container; e.g. `wildfly:18.0.1.Final`.
 // TODO support | `glassfish` | https://javaee.github.io/glassfish/[Glassfish] | https://hub.docker.com/_/glassfish[`glassfish`] | deprecated image!
 |=======================
 
+Set the system property `testcontainer-reuse` to `true` to let the container run as long as the config doesn't change.
+This feature is in beta of testcontainers.org (see https://github.com/testcontainers/testcontainers-java/pull/1781[PR-1781]).
+
 == Limitations
 
 You can't currently configure your application, e.g. by adding data sources.

@@ -20,6 +20,7 @@ import java.net.URI;
 public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     static final Client CLIENT = ClientBuilder.newClient();
     public static final String CONTAINER_SELECTOR_PROPERTY = "jee-testcontainer";
+    public static final String TESTCONTAINER_REUSE_PROPERTY = "testcontainer-reuse";
 
     public static JeeContainer create() {
         switch (containerKey()) {
@@ -52,6 +53,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     public JeeContainer(String image) {
         super(tagged(image, containerTag()));
         withLogConsumer(new StdoutLogConsumer());
+        withReuse(Boolean.getBoolean(TESTCONTAINER_REUSE_PROPERTY));
     }
 
     protected static String tagged(String image, String tag) {

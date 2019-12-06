@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.utility.MountableFile;
 
+import static com.github.t1.testcontainers.jee.JeeContainer.CONTAINER_SELECTOR_PROPERTY;
+import static com.github.t1.testcontainers.jee.JeeContainer.TESTCONTAINER_REUSE_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static test.TestTools.withSystemProperty;
@@ -31,6 +33,18 @@ public class JeeContainerBehavior {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Container is not started.");
         }
+
+        @Test void shouldNotConfigureTestcontainerReuseByDefault() {
+            assertThat(container.isShouldBeReused()).isFalse();
+        }
+
+        @Test void shouldConfigureTestcontainerReuse() {
+            withSystemProperty(TESTCONTAINER_REUSE_PROPERTY, "true", () -> {
+                JeeContainer container = JeeContainer.create();
+
+                assertThat(container.isShouldBeReused()).isTrue();
+            });
+        }
     }
 
     @Nested class ContainerSelection {
@@ -39,7 +53,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldSelectWildflyBySystemProperty() {
-            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "wildfly", () -> {
+            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly", () -> {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(WildflyContainer.class);
@@ -48,7 +62,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldSelectVersionBySystemProperty() {
-            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "wildfly:18.0.1.Final", () -> {
+            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly:18.0.1.Final", () -> {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(WildflyContainer.class);
@@ -57,7 +71,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldSelectOpenLibertyBySystemProperty() {
-            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "open-liberty", () -> {
+            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "open-liberty", () -> {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(OpenLibertyContainer.class);
@@ -65,7 +79,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldSelectTomEeBySystemProperty() {
-            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "tomee", () -> {
+            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "tomee", () -> {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(TomEeContainer.class);
@@ -73,7 +87,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldSelectPayaraBySystemProperty() {
-            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "payara", () -> {
+            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "payara", () -> {
                 JeeContainer container = JeeContainer.create();
 
                 assertThat(container).isInstanceOf(PayaraContainer.class);
@@ -81,7 +95,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldFailToSelectUnknownContainerBySystemProperty() {
-            withSystemProperty(JeeContainer.CONTAINER_SELECTOR_PROPERTY, "unknown", () -> {
+            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "unknown", () -> {
                 Throwable throwable = catchThrowable(JeeContainer::create);
 
                 assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
