@@ -27,13 +27,17 @@ The console output of the container is piped to the test's output, STDOUT in gre
 
 As seen in the prototypical example above, you can install an application by calling `.withDeployment(<file>)`.
 
-Instead of a local file, you can also install from an URL. Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`. Note that in this case, the file already has to be downloaded manually to you local maven repository... I plan to fix that; tell me if you need it.
+Instead of a local file, you can also install from an URL. Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`.
+Note that in this case, the file already has to be downloaded manually to you local maven repository... I plan to fix that; tell me if you need it.
 
 == Configuration
 
-Set the system property `jee-testcontainer` to one of the following keys to select the corresponding container. Ideally you shouldn't have to care about what server your application runs on, or you may even want to test it in multiple containers. Then you can run your test suite in your CI pipeline with different system properties.
+Set the system property `jee-testcontainer` to one of the following keys to select the corresponding container.
+Ideally you shouldn't have to care about what server your application runs on, or you may even want to test it in multiple containers.
+Then you can run your test suite in your CI pipeline with different system properties.
 
-You can append a tag to the `jee-testcontainer` separated by a colon `:`. This is often simply the version of the container; e.g. `wildfly:18.0`.
+You can append a tag to the `jee-testcontainer` separated by a colon `:`.
+This is often simply the version of the container; e.g. `wildfly:18.0.1.Final`.
 
 [options="header",cols="15%,15%,40%,30%"]
 |=======================
