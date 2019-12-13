@@ -13,5 +13,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Pre-fetch jolokia 1.6.2
+      run: mvn -B mvn dependency:get -Dartifact=org.jolokia:jolokia-war-unsecured:1.6.2:war
     - name: Build with Maven
-      run: mvn -B package
+      run: mvn -B verify
