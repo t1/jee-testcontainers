@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static com.github.t1.testcontainers.jee.JeeContainer.CLIENT;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.Response.Status.OK;
 
 @Slf4j
@@ -78,11 +79,22 @@ abstract class Deployable {
                 .resolve(version)
                 .resolve(artifactId + "-" + version + "." + type);
 
-            if (Files.notExists(path))
-                throw new IllegalArgumentException("maven artifact is not downloaded to local repository in " + path + ". Execute:\n"
-                    + "mvn dependency:get -Dartifact=" + groupId + ":" + artifactId + ":" + version + ":" + type);
+            if (Files.notExists(path)) {
+                download(groupId + ":" + artifactId + ":" + version + ":" + type);
+            }
 
             return path;
+        }
+
+        @SneakyThrows({IOException.class, InterruptedException.class})
+        private void download(String gavt) {
+            ProcessBuilder builder = new ProcessBuilder("mvn", "dependency:get", "-Dartifact=" + gavt)
+                .redirectErrorStream(true);
+            Process process = builder.start();
+            boolean inTime = process.waitFor(60, SECONDS);
+            if (!inTime) {
+                throw new RuntimeException("timeout download " + gavt);
+            }
         }
 
         @Override String getFileName() {

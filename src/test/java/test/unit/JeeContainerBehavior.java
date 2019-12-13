@@ -110,7 +110,7 @@ public class JeeContainerBehavior {
 
             assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured");
             assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
-            assertThat(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2);
+            assertThat(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2 + REPO_PATH);
         }
 
         @Test void shouldFailToGetDeploymentFromNonMavenUrn() {
@@ -175,11 +175,11 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldGetDeploymentFromLocalFileUrl() {
-            container.withDeployment("file://" + LOCAL_M2);
+            container.withDeployment("file://" + LOCAL_M2 + REPO_PATH);
 
             assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured-1.6.2");
             assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH_V);
-            assertThat(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2);
+            assertThat(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2 + REPO_PATH);
         }
 
         @Test void shouldGetDeploymentFromLocalFileWithoutVersion() {

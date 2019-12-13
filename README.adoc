@@ -28,7 +28,6 @@ The console output of the container is piped to the test's output, STDOUT in gre
 As seen in the prototypical example above, you can install an application by calling `.withDeployment(<file>)`.
 
 Instead of a local file, you can also install from an URL. Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`.
-Note that in this case, the file already has to be downloaded manually to you local maven repository... I plan to fix that; tell me if you need it.
 
 == Configuration
 
@@ -58,5 +57,4 @@ You can't currently configure your application, e.g. by adding data sources.
 I will add that when I need it, which may be very soon ;-)
 
 // TODO health wait strategy
-// TODO actually do the mvn download instead: mvn dependency:get -Dartifact=org.jolokia:jolokia-war:1.3.7:war
 // TODO configure config values, data sources, message queues, loggers, etc.
