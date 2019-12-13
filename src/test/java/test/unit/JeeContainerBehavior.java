@@ -136,14 +136,6 @@ public class JeeContainerBehavior {
             assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("expected exactly 5 elements in 'mvn' urn");
         }
-
-        @Test void shouldFailToGetDeploymentFromMavenUrnWhenNotDownloaded() {
-            Throwable throwable = catchThrowable(() ->
-                container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.1:war"));
-
-            assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("maven artifact is not downloaded to local repository");
-        }
     }
 
     @Nested class MavenCentralUrl {
