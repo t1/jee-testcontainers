@@ -16,7 +16,34 @@ public class MyAppIT {
     @Test void shouldGetJolokiaResponse() {
         String body = CONTAINER.target().request(APPLICATION_JSON_TYPE).get(String.class);
 
-        assertThat(body).isEqualTo("{\"status\":\"okay\"}");
+        then(body).isEqualTo("{\"status\":\"okay\"}");
+    }
+}
+---------------------------------------------------------------
+
+Or if you have an implementation of Microprofile Rest Client on your test classpath:
+
+[source,java]
+---------------------------------------------------------------
+@Testcontainers
+public class MyAppIT {
+    @Container static JeeContainer CONTAINER = JeeContainer.create()
+        .withDeployment("target/my-app.war");
+
+    @Data public static class Status {
+        String condition;
+    }
+
+    public interface StatusApi {
+        @GET Status getStatus();
+    }
+
+    @Test void shouldGetJolokiaResponse() {
+        StatusApi body = CONTAINER.restClient(StatusApi.class);
+
+        Status status = body.getStatus();
+
+        then(status.getCondition()).isEqualTo("okay");
     }
 }
 ---------------------------------------------------------------
@@ -43,7 +70,7 @@ This is often simply the version of the container; e.g. `wildfly:18.0.1.Final`.
 | Key | Container | Docker Image | Notes
 | `wildfly` | https://wildfly.org[WildFly] | https://hub.docker.com/r/jboss/wildfly[`jboss/wildfly`] | default container, not an 'official' image
 | `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] |
-| `tomee` | https://tomee.apache.org[TomEE] | https://hub.docker.com/_/tomee[`tomee`] |
+| `tomee` | https://tomee.apache.org[TomEE] | https://hub.docker.com/_/tomee[`tomee`] | Official image but currently outdated
 | `payara` | https://www.payara.fish[Payara] | https://hub.docker.com/r/payara/server-full[`payara`] | not an 'official' image
 // TODO support | `glassfish` | https://javaee.github.io/glassfish/[Glassfish] | https://hub.docker.com/_/glassfish[`glassfish`] | deprecated image!
 |=======================

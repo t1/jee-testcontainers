@@ -2,6 +2,7 @@ package com.github.t1.testcontainers.jee;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.MountableFile;
 
@@ -90,5 +91,11 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         if (fileName.endsWith(".war") || fileName.endsWith(".ear"))
             fileName = fileName.substring(0, fileName.length() - 4);
         return fileName;
+    }
+
+    public <T> T restClient(Class<T> type) {
+        return RestClientBuilder.newBuilder()
+            .baseUri(baseUri())
+            .build(type);
     }
 }
