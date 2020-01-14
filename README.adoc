@@ -13,7 +13,7 @@ public class MyAppIT {
     @Container static JeeContainer CONTAINER = JeeContainer.create()
         .withDeployment("target/my-app.war");
 
-    @Test void shouldGetJolokiaResponse() {
+    @Test void shouldGetStatusResponse() {
         String body = CONTAINER.target().request(APPLICATION_JSON_TYPE).get(String.class);
 
         then(body).isEqualTo("{\"status\":\"okay\"}");
@@ -38,7 +38,7 @@ public class MyAppIT {
         @GET Status getStatus();
     }
 
-    @Test void shouldGetJolokiaResponse() {
+    @Test void shouldGetStatusResponse() {
         StatusApi body = CONTAINER.restClient(StatusApi.class);
 
         Status status = body.getStatus();
