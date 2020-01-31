@@ -11,6 +11,7 @@ import org.testcontainers.utility.MountableFile;
 
 import static com.github.t1.testcontainers.jee.JeeContainer.CONTAINER_SELECTOR_PROPERTY;
 import static com.github.t1.testcontainers.jee.JeeContainer.TESTCONTAINER_REUSE_PROPERTY;
+import static com.github.t1.testcontainers.jee.NamedAsMod.namedAs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static test.TestTools.withSystemProperty;
@@ -136,6 +137,15 @@ public class JeeContainerBehavior {
             assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("expected exactly 5 elements in 'mvn' urn");
         }
+
+        @Test void shouldModifyName() {
+            container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war",
+                namedAs("foo.war"));
+
+            assertThat(container.webContext()).isEqualTo("foo");
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
+            assertThat(getMountableFile().getResolvedPath()).endsWith("/foo.war");
+        }
     }
 
     @Nested class MavenCentralUrl {
@@ -154,6 +164,15 @@ public class JeeContainerBehavior {
 
             assertThat(throwable).isInstanceOf(IllegalStateException.class)
                 .hasMessage("can't download " + url + ": 404 Not Found");
+        }
+
+        @Test void shouldModifyName() {
+            container.withDeployment("https://repo1.maven.org/maven2" + REPO_PATH,
+                namedAs("foo.war"));
+
+            assertThat(container.webContext()).isEqualTo("foo");
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
+            assertThat(getMountableFile().getResolvedPath()).endsWith("/foo.war");
         }
     }
 
@@ -188,6 +207,15 @@ public class JeeContainerBehavior {
             assertThat(container.webContext()).isEqualTo("bar-12.14.17345-SNAPSHOT");
             assertThat(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/bar-12.14.17345-SNAPSHOT.war");
             assertThat(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar-12.14.17345-SNAPSHOT.war");
+        }
+
+        @Test void shouldModifyName() {
+            container.withDeployment("file://" + LOCAL_M2 + REPO_PATH,
+                namedAs("foo.war"));
+
+            assertThat(container.webContext()).isEqualTo("foo");
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
+            assertThat(getMountableFile().getResolvedPath()).endsWith("/foo.war");
         }
     }
 

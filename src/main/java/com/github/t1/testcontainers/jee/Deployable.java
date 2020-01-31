@@ -39,6 +39,10 @@ abstract class Deployable {
         return (scheme == null) ? "file" : scheme;
     }
 
+    static Deployable copyOf(Deployable deployable, String fileName) {
+        return new CopyOf(deployable, fileName);
+    }
+
 
     private static class FileDeployable extends Deployable {
         @Getter private final Path localPath;
@@ -104,31 +108,53 @@ abstract class Deployable {
 
 
     private static class UrlDeployable extends Deployable {
-        private final URI deployment;
+        private final URI uri;
         @Getter private final String fileName;
+        private final Path tempFile;
 
-        private UrlDeployable(URI deployment) {
-            this.deployment = deployment;
-            this.fileName = fileName(deployment);
+        @SneakyThrows(IOException.class)
+        private UrlDeployable(URI uri) {
+            this.uri = uri;
+            this.fileName = fileName(uri);
+            this.tempFile = Files.createTempDirectory("downloads").resolve(fileName);
         }
 
         @Override Path getLocalPath() {
-            return download(deployment);
+            if (!Files.exists(tempFile))
+                download();
+            return tempFile;
         }
 
         @SneakyThrows(IOException.class)
-        private Path download(URI deployment) {
-            Path tempFile = Files.createTempDirectory("downloads").resolve(fileName);
-            log.info("download " + deployment + " to " + tempFile);
+        private void download() {
+            log.info("download " + uri + " to " + tempFile);
 
-            Response get = CLIENT.target(deployment).request().buildGet().invoke();
+            Response get = CLIENT.target(uri).request().buildGet().invoke();
             if (get.getStatusInfo() != OK)
-                throw new IllegalStateException("can't download " + deployment
+                throw new IllegalStateException("can't download " + uri
                     + ": " + get.getStatus() + " " + get.getStatusInfo());
             InputStream inputStream = get.readEntity(InputStream.class);
 
             Files.copy(inputStream, tempFile);
+        }
+    }
 
+    private static class CopyOf extends Deployable {
+        private final Deployable deployable;
+        private final Path tempFile;
+        @Getter private final String fileName;
+
+        @SneakyThrows(IOException.class)
+        private CopyOf(Deployable deployable, String fileName) {
+            this.deployable = deployable;
+            this.fileName = fileName;
+            this.tempFile = Files.createTempDirectory("copies").resolve(fileName);
+        }
+
+        @SneakyThrows(IOException.class)
+        @Override Path getLocalPath() {
+            if (!Files.exists(tempFile))
+                Files.copy(deployable.getLocalPath(), tempFile);
             return tempFile;
         }
     }

@@ -61,12 +61,14 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         return (tag == null) ? image : (image + ":" + tag);
     }
 
-    public JeeContainer withDeployment(String deployableString) {
-        return withDeployment(URI.create(deployableString));
+    public JeeContainer withDeployment(String deployableString, Mod... mods) {
+        return withDeployment(URI.create(deployableString), mods);
     }
 
-    public JeeContainer withDeployment(URI deployable) {
+    public JeeContainer withDeployment(URI deployable, Mod... mods) {
         this.deployable = Deployable.create(deployable);
+        for (Mod mod : mods)
+            this.deployable = mod.apply(this.deployable);
         withCopyFileToContainer(MountableFile.forHostPath(this.deployable.getLocalPath()), containerPath());
         return self();
     }
