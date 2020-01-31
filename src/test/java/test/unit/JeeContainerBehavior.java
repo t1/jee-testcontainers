@@ -5,13 +5,21 @@ import com.github.t1.testcontainers.jee.OpenLibertyContainer;
 import com.github.t1.testcontainers.jee.PayaraContainer;
 import com.github.t1.testcontainers.jee.TomEeContainer;
 import com.github.t1.testcontainers.jee.WildflyContainer;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.utility.MountableFile;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import static com.github.t1.testcontainers.jee.AddLibMod.addLib;
 import static com.github.t1.testcontainers.jee.JeeContainer.CONTAINER_SELECTOR_PROPERTY;
 import static com.github.t1.testcontainers.jee.JeeContainer.TESTCONTAINER_REUSE_PROPERTY;
 import static com.github.t1.testcontainers.jee.NamedAsMod.namedAs;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static test.TestTools.withSystemProperty;
@@ -146,6 +154,66 @@ public class JeeContainerBehavior {
             assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
             assertThat(getMountableFile().getResolvedPath()).endsWith("/foo.war");
         }
+
+        @Test void shouldAddOneLibrary() {
+            container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war",
+                addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"));
+
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            assertThat(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
+                "META-INF/",
+                "META-INF/MANIFEST.MF",
+                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
+                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.xml",
+                "WEB-INF/",
+                "WEB-INF/classes/",
+                "WEB-INF/lib/",
+                "WEB-INF/lib/jolokia-core-1.6.2.jar",
+                "WEB-INF/lib/jolokia-jsr160-1.6.2.jar",
+                "WEB-INF/lib/json-simple-1.1.1.jar",
+                "WEB-INF/lib/slf4j-api-1.7.30.jar",
+                "WEB-INF/web.xml"
+            );
+        }
+
+        @Test void shouldAddOneLibraryToJarWithoutLibraries() {
+            container.withDeployment("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar",
+                addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
+
+            assertThat(container.getCopyToFileContainerPathMap())
+                .containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
+            assertThat(filesInZip(getMountableFile().getResolvedPath())).contains(
+                "WEB-INF/lib/slf4j-jdk14-1.7.30.jar"
+            );
+        }
+
+        @Test void shouldAddTwoLibraries() {
+            container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war",
+                addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"),
+                addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
+
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            assertThat(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
+                "META-INF/",
+                "META-INF/MANIFEST.MF",
+                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
+                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.xml",
+                "WEB-INF/",
+                "WEB-INF/classes/",
+                "WEB-INF/lib/",
+                "WEB-INF/lib/jolokia-core-1.6.2.jar",
+                "WEB-INF/lib/jolokia-jsr160-1.6.2.jar",
+                "WEB-INF/lib/json-simple-1.1.1.jar",
+                "WEB-INF/lib/slf4j-api-1.7.30.jar",
+                "WEB-INF/lib/slf4j-jdk14-1.7.30.jar",
+                "WEB-INF/web.xml"
+            );
+        }
+    }
+
+    @SneakyThrows(IOException.class)
+    private static List<String> filesInZip(String path) {
+        return new ZipFile(path).stream().map(ZipEntry::getName).sorted().collect(toList());
     }
 
     @Nested class MavenCentralUrl {

@@ -39,6 +39,10 @@ abstract class Deployable {
         return (scheme == null) ? "file" : scheme;
     }
 
+    static Deployable copyOf(Deployable deployable) {
+        return new CopyOf(deployable, deployable.getFileName());
+    }
+
     static Deployable copyOf(Deployable deployable, String fileName) {
         return new CopyOf(deployable, fileName);
     }
@@ -139,7 +143,7 @@ abstract class Deployable {
         }
     }
 
-    private static class CopyOf extends Deployable {
+    static class CopyOf extends Deployable {
         private final Deployable deployable;
         private final Path tempFile;
         @Getter private final String fileName;
