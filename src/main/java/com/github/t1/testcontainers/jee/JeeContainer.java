@@ -10,6 +10,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import java.net.URI;
+import java.nio.file.Path;
 
 /**
  * Testcontainer for Jakarta EE application servers.
@@ -69,7 +70,9 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         this.deployable = Deployable.create(deployable);
         for (Mod mod : mods)
             this.deployable = mod.apply(this.deployable);
-        withCopyFileToContainer(MountableFile.forHostPath(this.deployable.getLocalPath()), containerPath());
+        Path localPath = this.deployable.getLocalPath();
+        log.info("deploy {} to {}", localPath, containerPath());
+        withCopyFileToContainer(MountableFile.forHostPath(localPath), containerPath());
         return self();
     }
 

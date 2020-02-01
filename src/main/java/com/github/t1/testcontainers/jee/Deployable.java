@@ -42,11 +42,11 @@ abstract class Deployable {
     }
 
     static Deployable copyOf(Deployable deployable) {
-        return new CopyOf(deployable, deployable.getFileName());
+        return new CopyOfDeployable(deployable, deployable.getFileName());
     }
 
     static Deployable copyOf(Deployable deployable, String fileName) {
-        return new CopyOf(deployable, fileName);
+        return new CopyOfDeployable(deployable, fileName);
     }
 
 
@@ -58,6 +58,10 @@ abstract class Deployable {
             this.localPath = (deployment.getScheme() == null)
                 ? Paths.get(deployment.toString()) : Paths.get(deployment);
             this.fileName = fileName(deployment);
+        }
+
+        @Override public String toString() {
+            return "FileDeployable[" + localPath + "->" + fileName + "]";
         }
     }
 
@@ -79,6 +83,10 @@ abstract class Deployable {
             this.artifactId = split[2];
             this.version = split[3];
             this.type = split[4];
+        }
+
+        @Override public String toString() {
+            return "UrnDeployable[" + groupId + ":" + artifactId + ":" + version + ":" + type + "]";
         }
 
         @Override Path getLocalPath() {
@@ -125,6 +133,10 @@ abstract class Deployable {
             this.tempFile = createTempDirectory("downloads").resolve(fileName);
         }
 
+        @Override public String toString() {
+            return "UrlDeployable[" + uri + ":" + fileName + "]";
+        }
+
         @Override Path getLocalPath() {
             if (notExists(tempFile))
                 download();
@@ -145,16 +157,20 @@ abstract class Deployable {
         }
     }
 
-    static class CopyOf extends Deployable {
+    static class CopyOfDeployable extends Deployable {
         private final Deployable deployable;
         private final Path tempFile;
         @Getter private final String fileName;
 
         @SneakyThrows(IOException.class)
-        private CopyOf(Deployable deployable, String fileName) {
+        private CopyOfDeployable(Deployable deployable, String fileName) {
             this.deployable = deployable;
             this.fileName = fileName;
             this.tempFile = createTempDirectory("copies").resolve(fileName);
+        }
+
+        @Override public String toString() {
+            return "CopyOfDeployable[" + deployable + ":" + fileName + "]";
         }
 
         @SneakyThrows(IOException.class)

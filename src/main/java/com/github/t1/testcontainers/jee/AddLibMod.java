@@ -43,6 +43,10 @@ public @Value class AddLibMod implements Mod {
         private final List<Deployable> libs = new ArrayList<>();
         private boolean done = false;
 
+        @Override public String toString() {
+            return "JarOutputDeployable[" + deployable + ":" + libs + "]";
+        }
+
         public void addLib(Deployable lib) { this.libs.add(lib); }
 
         @Override String getFileName() { return deployable.getFileName(); }
@@ -60,7 +64,7 @@ public @Value class AddLibMod implements Mod {
             // opening the jar as a file system loses the read permission for group and other, but we need that
             Set<PosixFilePermission> permissions = getPosixFilePermissions(path);
             try (FileSystem jar = FileSystems.newFileSystem(path, null)) {
-                Path libFolder = jar.getPath("/WEB-INF/lib/");
+                Path libFolder = jar.getPath("WEB-INF/lib/");
                 if (notExists(libFolder))
                     createDirectories(libFolder);
                 for (Deployable lib : libs) {
@@ -69,6 +73,8 @@ public @Value class AddLibMod implements Mod {
                     Path libPath = libFolder.resolve(fileName);
                     copy(lib.getLocalPath(), libPath);
                 }
+            } catch (IOException | RuntimeException e) {
+                throw new RuntimeException("can't add libs " + libs + " to " + path, e);
             }
             setPosixFilePermissions(path, permissions);
         }
