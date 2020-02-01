@@ -65,7 +65,7 @@ public @Value class AddLibMod implements Mod {
                     createDirectories(libFolder);
                 for (Deployable lib : libs) {
                     String fileName = lib.getLocalPath().getFileName().toString();
-                    log.info("add {} to {}", fileName, jar + ":" + path);
+                    log.info("add lib {} to {}", fileName, jar);
                     Path libPath = libFolder.resolve(fileName);
                     copy(lib.getLocalPath(), libPath);
                 }
