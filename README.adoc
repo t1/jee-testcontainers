@@ -79,6 +79,36 @@ This is often simply the version of the container; e.g. `wildfly:18.0.1.Final`.
 Set the system property `testcontainer-reuse` to `true` to let the container run as long as the config doesn't change.
 This feature is in beta of testcontainers.org (see https://github.com/testcontainers/testcontainers-java/pull/1781[PR-1781]).
 
+== Modifications
+
+You can modify the deployable in two ways. You can have multiple and repeated modification to, e.g., rename the file and add multiple libraries.
+
+=== Rename
+
+[source,java]
+---------------------------------------------------------------
+import static com.github.t1.testcontainers.jee.NamedAsMod.namedAs;
+
+@Testcontainers
+public class MyAppIT {
+    @Container static JeeContainer CONTAINER = JeeContainer.create()
+        .withDeployment("target/my-app.war", namedAs("foo.war"));
+}
+---------------------------------------------------------------
+
+=== Add Library
+
+[source,java]
+---------------------------------------------------------------
+import static com.github.t1.testcontainers.jee.AddLibMod.addLib;
+
+@Testcontainers
+public class MyAppIT {
+    @Container static JeeContainer CONTAINER = JeeContainer.create()
+        .withDeployment("target/my-app.war", addLib("urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war"));
+}
+---------------------------------------------------------------
+
 == Limitations
 
 You can't currently configure your application, e.g. by adding data sources.
