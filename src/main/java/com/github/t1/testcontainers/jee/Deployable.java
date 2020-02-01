@@ -8,11 +8,13 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static com.github.t1.testcontainers.jee.JeeContainer.CLIENT;
+import static java.nio.file.Files.copy;
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.Files.notExists;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.Response.Status.OK;
 
@@ -87,7 +89,7 @@ abstract class Deployable {
                 .resolve(version)
                 .resolve(artifactId + "-" + version + "." + type);
 
-            if (Files.notExists(path)) {
+            if (notExists(path)) {
                 download(groupId + ":" + artifactId + ":" + version + ":" + type);
             }
 
@@ -120,11 +122,11 @@ abstract class Deployable {
         private UrlDeployable(URI uri) {
             this.uri = uri;
             this.fileName = fileName(uri);
-            this.tempFile = Files.createTempDirectory("downloads").resolve(fileName);
+            this.tempFile = createTempDirectory("downloads").resolve(fileName);
         }
 
         @Override Path getLocalPath() {
-            if (!Files.exists(tempFile))
+            if (notExists(tempFile))
                 download();
             return tempFile;
         }
@@ -139,7 +141,7 @@ abstract class Deployable {
                     + ": " + get.getStatus() + " " + get.getStatusInfo());
             InputStream inputStream = get.readEntity(InputStream.class);
 
-            Files.copy(inputStream, tempFile);
+            copy(inputStream, tempFile);
         }
     }
 
@@ -152,13 +154,13 @@ abstract class Deployable {
         private CopyOf(Deployable deployable, String fileName) {
             this.deployable = deployable;
             this.fileName = fileName;
-            this.tempFile = Files.createTempDirectory("copies").resolve(fileName);
+            this.tempFile = createTempDirectory("copies").resolve(fileName);
         }
 
         @SneakyThrows(IOException.class)
         @Override Path getLocalPath() {
-            if (!Files.exists(tempFile))
-                Files.copy(deployable.getLocalPath(), tempFile);
+            if (notExists(tempFile))
+                copy(deployable.getLocalPath(), tempFile);
             return tempFile;
         }
     }

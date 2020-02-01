@@ -10,12 +10,16 @@ import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createDirectories;
-import static java.nio.file.Files.exists;
+import static java.nio.file.Files.getPosixFilePermissions;
+import static java.nio.file.Files.notExists;
+import static java.nio.file.Files.setPosixFilePermissions;
 
 @Slf4j
 public @Value class AddLibMod implements Mod {
@@ -45,25 +49,28 @@ public @Value class AddLibMod implements Mod {
 
         @Override Path getLocalPath() {
             if (!done) {
-                addLibs();
+                addLibs(deployable.getLocalPath());
                 done = true;
             }
             return deployable.getLocalPath();
         }
 
         @SneakyThrows(IOException.class)
-        private void addLibs() {
-            try (FileSystem jar = FileSystems.newFileSystem(deployable.getLocalPath(), null)) {
+        private void addLibs(Path path) {
+            // opening the jar as a file system loses the read permission for group and other, but we need that
+            Set<PosixFilePermission> permissions = getPosixFilePermissions(path);
+            try (FileSystem jar = FileSystems.newFileSystem(path, null)) {
                 Path libFolder = jar.getPath("/WEB-INF/lib/");
-                if (!exists(libFolder))
+                if (notExists(libFolder))
                     createDirectories(libFolder);
                 for (Deployable lib : libs) {
                     String fileName = lib.getLocalPath().getFileName().toString();
-                    log.info("add {} to {}", fileName, jar + ":" + deployable.getLocalPath());
+                    log.info("add {} to {}", fileName, jar + ":" + path);
                     Path libPath = libFolder.resolve(fileName);
                     copy(lib.getLocalPath(), libPath);
                 }
             }
+            setPosixFilePermissions(path, permissions);
         }
     }
 }
