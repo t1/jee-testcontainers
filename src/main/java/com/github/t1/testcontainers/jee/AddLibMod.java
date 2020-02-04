@@ -49,9 +49,9 @@ public @Value class AddLibMod implements Mod {
 
         public void addLib(Deployable lib) { this.libs.add(lib); }
 
-        @Override String getFileName() { return deployable.getFileName(); }
+        @Override public String getFileName() { return deployable.getFileName(); }
 
-        @Override Path getLocalPath() {
+        @Override public Path getLocalPath() {
             if (!done) {
                 addLibs(deployable.getLocalPath());
                 done = true;
@@ -61,9 +61,9 @@ public @Value class AddLibMod implements Mod {
 
         @SneakyThrows(IOException.class)
         private void addLibs(Path path) {
-            // opening the jar as a file system loses the read permission for group and other, but we need that
+            // opening the jar as a file system loses the file permission for group and other, but we need that
             Set<PosixFilePermission> permissions = getPosixFilePermissions(path);
-            try (FileSystem jar = FileSystems.newFileSystem(path, null)) {
+            try (FileSystem jar = FileSystems.newFileSystem(path, (ClassLoader) null)) {
                 Path libFolder = jar.getPath("WEB-INF/lib/");
                 if (notExists(libFolder))
                     createDirectories(libFolder);

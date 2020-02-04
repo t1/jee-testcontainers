@@ -19,13 +19,15 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.Response.Status.OK;
 
 @Slf4j
-abstract class Deployable {
+public abstract class Deployable {
 
-    abstract Path getLocalPath();
+    public abstract Path getLocalPath();
 
-    abstract String getFileName();
+    public abstract String getFileName();
 
-    static Deployable create(URI deployable) {
+    public static Deployable create(String deployable) { return create(URI.create(deployable)); }
+
+    public static Deployable create(URI deployable) {
         switch (scheme(deployable)) {
             case "file":
                 return new FileDeployable(deployable);
@@ -41,7 +43,7 @@ abstract class Deployable {
         return (scheme == null) ? "file" : scheme;
     }
 
-    static Deployable copyOf(Deployable deployable) {
+    public static Deployable copyOf(Deployable deployable) {
         return new CopyOfDeployable(deployable, deployable.getFileName());
     }
 
@@ -89,7 +91,7 @@ abstract class Deployable {
             return "UrnDeployable[" + groupId + ":" + artifactId + ":" + version + ":" + type + "]";
         }
 
-        @Override Path getLocalPath() {
+        @Override public Path getLocalPath() {
             Path path = Paths.get(System.getProperty("user.home"))
                 .resolve(".m2/repository")
                 .resolve(groupId.replace('.', '/'))
@@ -115,7 +117,7 @@ abstract class Deployable {
             }
         }
 
-        @Override String getFileName() {
+        @Override public String getFileName() {
             return artifactId + "." + type;
         }
     }
@@ -137,7 +139,7 @@ abstract class Deployable {
             return "UrlDeployable[" + uri + ":" + fileName + "]";
         }
 
-        @Override Path getLocalPath() {
+        @Override public Path getLocalPath() {
             if (notExists(tempFile))
                 download();
             return tempFile;
@@ -174,7 +176,7 @@ abstract class Deployable {
         }
 
         @SneakyThrows(IOException.class)
-        @Override Path getLocalPath() {
+        @Override public Path getLocalPath() {
             if (notExists(tempFile))
                 copy(deployable.getLocalPath(), tempFile);
             return tempFile;
