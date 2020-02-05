@@ -17,5 +17,7 @@ jobs:
       with:
         path: ~/.m2/repository
         key: maven-${{ hashFiles('**/pom.xml') }}
+    - name: Pre-fetch jolokia 1.6.2 # so JeeContainerBehavior.LocalFileUrl can access a file directly
+      run: mvn --batch-mode dependency:get -Dartifact=org.jolokia:jolokia-war-unsecured:1.6.2:war
     - name: Build with Maven
       run: mvn --batch-mode verify
