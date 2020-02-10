@@ -78,13 +78,13 @@ public abstract class Deployable {
             String[] split = deployment.getSchemeSpecificPart().split(":");
             if (!"mvn".equals(split[0]))
                 throw new IllegalArgumentException("unsupported urn scheme '" + split[0] + "'");
-            if (split.length != 5)
-                throw new IllegalArgumentException("expected exactly 5 elements in 'mvn' urn '" + deployment + "': " +
-                    "`urn:mvn:<group-id>:<artifact-id>:<version>:<type>`");
+            if (split.length < 4 || split.length > 5)
+                throw new IllegalArgumentException("expected 4 or 5 elements in 'mvn' urn '" + deployment + "': " +
+                    "`urn:mvn:<group-id>:<artifact-id>:<version>[:<type>]`");
             this.groupId = split[1];
             this.artifactId = split[2];
             this.version = split[3];
-            this.type = split[4];
+            this.type = (split.length > 4) ? split[4] : "jar";
         }
 
         @Override public String toString() {

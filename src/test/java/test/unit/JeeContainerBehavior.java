@@ -130,12 +130,19 @@ public class JeeContainerBehavior {
                 .hasMessage("unsupported urn scheme 'xxx'");
         }
 
-        @Test void shouldFailToGetDeploymentFromMavenUrnWithoutType() {
+        @Test void shouldFailToGetDeploymentFromMavenUrnWithoutVersion() {
             Throwable throwable = catchThrowable(() ->
-                container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION));
+                container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured"));
 
             assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("expected exactly 5 elements in 'mvn' urn");
+                .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
+        }
+
+        @Test void shouldGetJarDeploymentFromMavenUrnWithoutType() {
+            container.withDeployment("urn:mvn:org.slf4j:slf4j-api:1.7.30");
+
+            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
+            assertThat(getMountableFile().getResolvedPath()).endsWith(".m2/repository/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar");
         }
 
         @Test void shouldFailToGetDeploymentFromMavenUrnWithExtraElement() {
@@ -143,7 +150,7 @@ public class JeeContainerBehavior {
                 container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war:xxx"));
 
             assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("expected exactly 5 elements in 'mvn' urn");
+                .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
         }
 
         @Test void shouldModifyName() {
