@@ -70,7 +70,7 @@ This is often simply the version of the container; e.g. `wildfly:18.0.1.Final`.
 |=======================
 | Key | Container | Docker Image | Notes
 | `wildfly` | https://wildfly.org[WildFly] | https://hub.docker.com/r/jboss/wildfly[`jboss/wildfly`] | default container, not an 'official' image
-| `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] |
+| `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] | add `server.xml` with features `javaee-8.0` and `microProfile-3.0`
 | `tomee` | https://tomee.apache.org[TomEE] | https://hub.docker.com/_/tomee[`tomee`] | Official image but currently outdated
 | `payara` | https://www.payara.fish[Payara] | https://hub.docker.com/r/payara/server-full[`payara`] | not an 'official' image
 // TODO support | `glassfish` | https://javaee.github.io/glassfish/[Glassfish] | https://hub.docker.com/_/glassfish[`glassfish`] | deprecated image!
