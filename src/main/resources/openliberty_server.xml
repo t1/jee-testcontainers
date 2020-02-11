@@ -12,8 +12,8 @@
 
     <httpEndpoint
             id="defaultHttpEndpoint"
-            httpPort="9080"
-            httpsPort="9443"
+            httpPort="8080"
+            httpsPort="8443"
             host="*"/>
     <applicationManager
             autoExpand="true"/>
