@@ -18,4 +18,10 @@
     <applicationManager
             autoExpand="true"/>
 
+    <logging
+            isoDateFormat="true"
+            consoleLogLevel="info"
+            consoleSource="message,trace"
+            consoleFormat="json"
+    />
 </server>
