@@ -13,7 +13,7 @@
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <resteasy.version>4.4.2.Final</resteasy.version>
+        <resteasy.version>4.5.1.Final</resteasy.version>
     </properties>
 
     <distributionManagement>
