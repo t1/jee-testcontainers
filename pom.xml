@@ -6,6 +6,7 @@
     <artifactId>jee-testcontainers</artifactId>
     <version>1.5.2-SNAPSHOT</version>
     <description>testcontainers.org for Jakarta EE application servers</description>
+    <url>https://github.com/t1/jee-testcontainers</url>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -18,29 +19,34 @@
 
     <distributionManagement>
         <repository>
-            <id>bintray-t1-javaee-helpers</id>
+            <id>ossrh</id>
             <name>t1-javaee-helpers</name>
-            <url>https://api.bintray.com/maven/t1/javaee-helpers/${project.artifactId}/;publish=1</url>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
     <licenses>
         <license>
             <name>Apache License 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <url>http://choosealicense.com/licenses/apache-2.0/</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <repositories>
-        <repository>
-            <id>jcenter</id>
-            <name>jcenter</name>
-            <url>https://jcenter.bintray.com</url>
-        </repository>
-    </repositories>
     <scm>
-        <developerConnection>scm:git:https://github.com/t1/${project.artifactId}</developerConnection>
+        <developerConnection>scm:git:https://github.com/t1/jee-testcontainers.git</developerConnection>
         <tag>HEAD</tag>
+        <url>https://github.com/t1/jee-testcontainers.git</url>
     </scm>
+
+    <developers>
+        <developer>
+            <id>t1</id>
+            <name>Rüdiger zu Dohna</name>
+        </developer>
+    </developers>
 
     <build>
         <defaultGoal>install</defaultGoal>
@@ -75,6 +81,16 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <tagNameFormat>@{project.version}</tagNameFormat>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>
