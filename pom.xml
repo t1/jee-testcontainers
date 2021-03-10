@@ -5,6 +5,7 @@
     <groupId>com.github.t1</groupId>
     <artifactId>jee-testcontainers</artifactId>
     <version>1.5.5-SNAPSHOT</version>
+    <name>jee-testcontainers</name>
     <description>testcontainers.org for Jakarta EE application servers</description>
     <url>https://github.com/t1/jee-testcontainers</url>
 
@@ -106,7 +107,9 @@
                 <version>2.5.3</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <tagNameFormat>@{project.version}</tagNameFormat>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
                 </configuration>
             </plugin>
             <plugin>
@@ -198,7 +201,9 @@
             <id>release</id>
             <build>
                 <plugins>
+                    <!-- always run source+javadoc => see problems early & source available in local repo -->
                     <plugin>
+                        <!-- but don't run gpg everywhere, esp. not in github actions -->
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.6</version>
                         <executions>
