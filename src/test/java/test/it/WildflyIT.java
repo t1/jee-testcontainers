@@ -8,7 +8,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import test.jolokia.JolokiaResponse;
 
 import javax.json.bind.JsonbBuilder;
-import javax.ws.rs.GET;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.jolokia.TestData.VERSION;
@@ -17,11 +16,6 @@ import static test.jolokia.TestData.VERSION;
 public class WildflyIT {
     @Container static JeeContainer CONTAINER = new WildflyContainer()
         .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
-
-    public interface JolokiaApi {
-        // Jolokia returns Content-Type `text/plain`, even when it's json :-(
-        @GET String get();
-    }
 
     @Test void shouldGetJolokiaResponse() {
         JolokiaApi jolokia = CONTAINER.restClient(JolokiaApi.class);

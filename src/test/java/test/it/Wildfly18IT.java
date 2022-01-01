@@ -9,22 +9,24 @@ import test.jolokia.JolokiaResponse;
 
 import javax.json.bind.JsonbBuilder;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.jolokia.TestData.VERSION;
 
 @Testcontainers
 public class Wildfly18IT {
-    @Container static JeeContainer CONTAINER = new WildflyContainer("18.0.1.Final")
+    private static final String WILDFLY_VERSION = "18.0.1.Final";
+
+    @Container static JeeContainer CONTAINER = new WildflyContainer(WILDFLY_VERSION)
         .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
 
     @Test void shouldGetJolokiaResponse() {
-        String string = CONTAINER.target().request(APPLICATION_JSON_TYPE).get(String.class);
+        JolokiaApi jolokia = CONTAINER.restClient(JolokiaApi.class);
 
-        JolokiaResponse response = JsonbBuilder.create().fromJson(string, JolokiaResponse.class);
+        JolokiaResponse response = JsonbBuilder.create().fromJson(jolokia.get(), JolokiaResponse.class);
+
         response.assertCurrent();
         assertThat(response.getValue().getInfo().getProduct()).isEqualTo("WildFly Full");
         assertThat(response.getValue().getInfo().getVendor()).isEqualTo("RedHat");
-        assertThat(response.getValue().getInfo().getVersion()).isEqualTo("18.0.1.Final");
+        assertThat(response.getValue().getInfo().getVersion()).isEqualTo(WILDFLY_VERSION);
     }
 }
