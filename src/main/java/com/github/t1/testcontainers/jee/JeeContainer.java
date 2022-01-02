@@ -1,6 +1,5 @@
 package com.github.t1.testcontainers.jee;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.testcontainers.containers.GenericContainer;
@@ -48,7 +47,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         return System.getProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly").split(":", 2);
     }
 
-    @Setter private String containerDeploymentPath;
+    private String containerDeploymentPath;
 
     private Deployable deployable;
 
@@ -60,6 +59,12 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
 
     protected static String tagged(String image, String tag) {
         return (tag == null) ? image : (image + ":" + tag);
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public JeeContainer withContainerDeploymentPath(String containerDeploymentPath) {
+        this.containerDeploymentPath = containerDeploymentPath;
+        return this;
     }
 
     public JeeContainer withDeployment(String deployableString, Mod... mods) {

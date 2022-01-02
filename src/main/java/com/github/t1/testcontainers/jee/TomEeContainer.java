@@ -7,7 +7,7 @@ public class TomEeContainer extends JeeContainer {
 
     public TomEeContainer(String tag) {
         super(tagged("tomee", tag));
-        setContainerDeploymentPath("/usr/local/tomee/webapps/");
+        withContainerDeploymentPath("/usr/local/tomee/webapps/");
         addExposedPort(8080);
         waitingFor(new LogMessageWaitStrategy()
             .withRegEx(".*Deployment of web application archive .* has finished.*"));

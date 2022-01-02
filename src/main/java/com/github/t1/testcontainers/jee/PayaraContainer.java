@@ -7,7 +7,7 @@ public class PayaraContainer extends JeeContainer {
 
     public PayaraContainer(String tag) {
         super(tagged("payara/server-full", tag));
-        setContainerDeploymentPath("/opt/payara/deployments/");
+        withContainerDeploymentPath("/opt/payara/deployments/");
         addExposedPort(8080);
         waitingFor(new LogMessageWaitStrategy().withRegEx(".*was successfully deployed in [0-9,]{1,10} milliseconds.*"));
     }

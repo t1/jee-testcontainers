@@ -10,7 +10,7 @@ public class OpenLibertyContainer extends JeeContainer {
 
     public OpenLibertyContainer(String tag) {
         super(tagged("open-liberty", tag));
-        setContainerDeploymentPath(SERVER_PATH + "/dropins/");
+        withContainerDeploymentPath(SERVER_PATH + "/dropins/");
         addExposedPort(8080);
         withCopyFileToContainer(MountableFile.forClasspathResource("/openliberty_server.xml"), SERVER_PATH + "/server.xml");
         waitingFor(new LogMessageWaitStrategy().withRegEx(".*CWWKZ0001I: Application .* started.*"));
