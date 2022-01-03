@@ -202,8 +202,8 @@
             <build>
                 <plugins>
                     <!-- always run source+javadoc => see problems early & source available in local repo -->
+                    <!-- don't run gpg everywhere, esp. not in a GitHub Action -->
                     <plugin>
-                        <!-- but don't run gpg everywhere, esp. not in github actions -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>3.0.1</version>
@@ -216,6 +216,13 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <!-- This is necessary for gpg to not try to use the pinentry programs in a GitHub Action -->
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
