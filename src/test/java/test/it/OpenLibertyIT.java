@@ -12,6 +12,7 @@ import javax.json.bind.JsonbBuilder;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static test.jolokia.TestData.VERSION;
 
+@OpenLiberty
 @Testcontainers
 public class OpenLibertyIT {
     @Container static JeeContainer CONTAINER = new OpenLibertyContainer()

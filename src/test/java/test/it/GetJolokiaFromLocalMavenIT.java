@@ -22,8 +22,9 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static test.jolokia.TestData.LOCAL_M2;
 import static test.jolokia.TestData.VERSION;
 
-@Slf4j
+@WildFly
 @Testcontainers
+@Slf4j
 public class GetJolokiaFromLocalMavenIT {
 
     @Container static JeeContainer CONTAINER = deleteLocalJolokiaVersionAndCreateJeeContainer();

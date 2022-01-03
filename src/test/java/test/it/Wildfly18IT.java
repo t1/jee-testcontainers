@@ -12,6 +12,7 @@ import javax.json.bind.JsonbBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.jolokia.TestData.VERSION;
 
+@WildFly
 @Testcontainers
 public class Wildfly18IT {
     private static final String WILDFLY_VERSION = "18.0.1.Final";

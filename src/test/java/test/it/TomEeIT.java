@@ -13,6 +13,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.jolokia.TestData.VERSION;
 
+@TomEE
 @Testcontainers
 public class TomEeIT {
     @Container static JeeContainer CONTAINER = new TomEeContainer()
