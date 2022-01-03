@@ -12,10 +12,12 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <resteasy.version>4.5.9.Final</resteasy.version>
+        <maven-test-plugins.version>2.22.2</maven-test-plugins.version>
     </properties>
 
     <distributionManagement>
@@ -54,8 +56,9 @@
         <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>${maven-test-plugins.version}</version>
                 <configuration>
                     <includes>
                         <include>*Behavior</include>
@@ -63,8 +66,9 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>${maven-test-plugins.version}</version>
                 <executions>
                     <execution>
                         <id>perform-it</id>
@@ -76,6 +80,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.2.1</version>
                 <executions>
@@ -88,6 +93,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.3.1</version>
                 <executions>
@@ -100,9 +106,11 @@
                 </executions>
                 <configuration>
                     <doclint>-missing</doclint>
+                    <source>${maven.compiler.source}</source>
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
@@ -201,8 +209,8 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <!-- always run source+javadoc => see problems early & source available in local repo -->
-                    <!-- don't run gpg everywhere, esp. not in a GitHub Action -->
+                    <!-- always run source+javadoc (above) => see problems early & source available in local repo -->
+                    <!-- but don't run gpg everywhere, esp. not in GitHub Actions -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
