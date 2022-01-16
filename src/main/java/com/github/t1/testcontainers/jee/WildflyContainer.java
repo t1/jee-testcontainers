@@ -12,7 +12,6 @@ public class WildflyContainer extends JeeContainer {
     public WildflyContainer(String image, String tag) {
         super(tagged(image, tag));
         withContainerDeploymentPath("/opt/jboss/wildfly/standalone/deployments/");
-        addExposedPort(8080);
         waitingFor(new LogMessageWaitStrategy().withRegEx(WAR_DEPLOYED_MESSAGE));
     }
 }

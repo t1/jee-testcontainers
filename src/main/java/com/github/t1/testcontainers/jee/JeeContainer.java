@@ -34,14 +34,14 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
             case "payara":
                 return new PayaraContainer();
             default:
-                throw new IllegalArgumentException("unsupported container type '"
-                    + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
+                throw new IllegalArgumentException(
+                    "unsupported container type '" + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
         }
     }
 
-    private static String containerKey() { return containerSelector()[0]; }
+    private static String containerKey() {return containerSelector()[0];}
 
-    private static String containerTag() { return containerSelector().length == 1 ? null : containerSelector()[1]; }
+    private static String containerTag() {return containerSelector().length == 1 ? null : containerSelector()[1];}
 
     private static String[] containerSelector() {
         return System.getProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly").split(":", 2);
@@ -55,11 +55,24 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         super(tagged(image, containerTag()));
         withLogConsumer(new StdoutLogConsumer());
         withReuse(Boolean.getBoolean(TESTCONTAINER_REUSE_PROPERTY));
+        addExposedPort(mainPort());
     }
 
     protected static String tagged(String image, String tag) {
         return (tag == null) ? image : (image + ":" + tag);
     }
+
+    public JeeContainer withFixedExposedPort(int hostPort, int containerPort) {
+        super.addFixedExposedPort(hostPort, containerPort);
+        return this;
+    }
+
+    public JeeContainer withFixedExposedMainPort(int hostPort) {
+        super.addFixedExposedPort(hostPort, mainPort());
+        return this;
+    }
+
+    public int mainPort() {return 8080;}
 
     @SuppressWarnings("UnusedReturnValue")
     public JeeContainer withContainerDeploymentPath(String containerDeploymentPath) {
@@ -87,8 +100,8 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
 
     public WebTarget target() {
         if (getContainerInfo() == null || getContainerInfo().getState() == null)
-            throw new IllegalStateException("Container is not started. " +
-                "Maybe you forgot the `@Testcontainers` or the `@Container` annotation,");
+            throw new IllegalStateException(
+                "Container is not started. Maybe you forgot the `@Testcontainers` or the `@Container` annotation,");
         return CLIENT.target(baseUri());
     }
 
