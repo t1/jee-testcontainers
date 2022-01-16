@@ -1,18 +1,26 @@
 package test;
 
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.function.Executable;
+import org.testcontainers.containers.GenericContainer;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.ServerSocket;
+import java.util.List;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
 public class TestTools {
-    public static void withSystemProperty(String property, String value, Runnable block) {
+    public static void withSystemProperty(String property, String value, Executable block) {
         String oldValue = System.getProperty(property);
         System.setProperty(property, value);
         try {
-            block.run();
+            block.execute();
+        } catch (Error | RuntimeException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         } finally {
             if (oldValue == null) {
                 System.clearProperty(property);
@@ -29,5 +37,12 @@ public class TestTools {
             then(serverSocket.getLocalPort()).isGreaterThan(0);
             return serverSocket.getLocalPort();
         }
+    }
+
+    public static List<String> portBindings(GenericContainer<?> container) throws NoSuchFieldException, IllegalAccessException {
+        Field portBindings = GenericContainer.class.getDeclaredField("portBindings");
+        portBindings.setAccessible(true);
+        //noinspection unchecked
+        return (List<String>) portBindings.get(container);
     }
 }

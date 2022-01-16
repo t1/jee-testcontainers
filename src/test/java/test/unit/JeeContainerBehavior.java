@@ -9,6 +9,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.utility.MountableFile;
+import test.TestTools;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,11 +18,12 @@ import java.util.zip.ZipFile;
 
 import static com.github.t1.testcontainers.jee.AddLibMod.addLib;
 import static com.github.t1.testcontainers.jee.JeeContainer.CONTAINER_SELECTOR_PROPERTY;
+import static com.github.t1.testcontainers.jee.JeeContainer.FIX_MAIN_PORT_PROPERTY;
 import static com.github.t1.testcontainers.jee.JeeContainer.TESTCONTAINER_REUSE_PROPERTY;
 import static com.github.t1.testcontainers.jee.NamedAsMod.namedAs;
 import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.BDDAssertions.then;
 import static test.TestTools.withSystemProperty;
 import static test.jolokia.TestData.LOCAL_M2;
 import static test.jolokia.TestData.REPO_PATH;
@@ -38,35 +40,44 @@ public class JeeContainerBehavior {
         @Test void shouldFailToGetTargetWhenContainerIsNotStarted() {
             Throwable throwable = catchThrowable(container::target);
 
-            assertThat(throwable)
+            then(throwable)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Container is not started.");
         }
 
         @Test void shouldNotConfigureTestcontainerReuseByDefault() {
-            assertThat(container.isShouldBeReused()).isFalse();
+            then(container.isShouldBeReused()).isFalse();
         }
 
         @Test void shouldConfigureTestcontainerReuse() {
             withSystemProperty(TESTCONTAINER_REUSE_PROPERTY, "true", () -> {
                 JeeContainer container = JeeContainer.create();
 
-                assertThat(container.isShouldBeReused()).isTrue();
+                then(container.isShouldBeReused()).isTrue();
+            });
+        }
+
+        @Test void shouldConfigureTestcontainerFixedMainPort() {
+            Integer port = 32894576;
+            withSystemProperty(FIX_MAIN_PORT_PROPERTY, port.toString(), () -> {
+                JeeContainer container = JeeContainer.create();
+
+                then(TestTools.portBindings(container)).containsExactly(port + ":8080/tcp");
             });
         }
     }
 
     @Nested class ContainerSelection {
         @Test void shouldSelectWildflyByDefault() {
-            assertThat(container).isInstanceOf(WildflyContainer.class);
+            then(container).isInstanceOf(WildflyContainer.class);
         }
 
         @Test void shouldSelectWildflyBySystemProperty() {
             withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly", () -> {
                 JeeContainer container = JeeContainer.create();
 
-                assertThat(container).isInstanceOf(WildflyContainer.class);
-                assertThat(container.getDockerImageName()).isEqualTo("jboss/wildfly:latest");
+                then(container).isInstanceOf(WildflyContainer.class);
+                then(container.getDockerImageName()).isEqualTo("jboss/wildfly:latest");
             });
         }
 
@@ -74,8 +85,8 @@ public class JeeContainerBehavior {
             withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly:18.0.1.Final", () -> {
                 JeeContainer container = JeeContainer.create();
 
-                assertThat(container).isInstanceOf(WildflyContainer.class);
-                assertThat(container.getDockerImageName()).isEqualTo("jboss/wildfly:18.0.1.Final");
+                then(container).isInstanceOf(WildflyContainer.class);
+                then(container.getDockerImageName()).isEqualTo("jboss/wildfly:18.0.1.Final");
             });
         }
 
@@ -83,7 +94,7 @@ public class JeeContainerBehavior {
             withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "open-liberty", () -> {
                 JeeContainer container = JeeContainer.create();
 
-                assertThat(container).isInstanceOf(OpenLibertyContainer.class);
+                then(container).isInstanceOf(OpenLibertyContainer.class);
             });
         }
 
@@ -91,7 +102,7 @@ public class JeeContainerBehavior {
             withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "tomee", () -> {
                 JeeContainer container = JeeContainer.create();
 
-                assertThat(container).isInstanceOf(TomEeContainer.class);
+                then(container).isInstanceOf(TomEeContainer.class);
             });
         }
 
@@ -99,7 +110,7 @@ public class JeeContainerBehavior {
             withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "payara", () -> {
                 JeeContainer container = JeeContainer.create();
 
-                assertThat(container).isInstanceOf(PayaraContainer.class);
+                then(container).isInstanceOf(PayaraContainer.class);
             });
         }
 
@@ -107,7 +118,7 @@ public class JeeContainerBehavior {
             withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "unknown", () -> {
                 Throwable throwable = catchThrowable(JeeContainer::create);
 
-                assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
+                then(throwable).isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("unsupported container type 'unknown'");
             });
         }
@@ -117,16 +128,16 @@ public class JeeContainerBehavior {
         @Test void shouldGetDeploymentFromMavenUrn() {
             container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
 
-            assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
-            assertThat(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2 + REPO_PATH);
+            then(container.webContext()).isEqualTo("jolokia-war-unsecured");
+            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            then(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2 + REPO_PATH);
         }
 
         @Test void shouldFailToGetDeploymentFromNonMavenUrn() {
             Throwable throwable = catchThrowable(() ->
                 container.withDeployment("urn:xxx:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war"));
 
-            assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
+            then(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("unsupported urn scheme 'xxx'");
         }
 
@@ -134,22 +145,22 @@ public class JeeContainerBehavior {
             Throwable throwable = catchThrowable(() ->
                 container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured"));
 
-            assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
+            then(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
         }
 
         @Test void shouldGetJarDeploymentFromMavenUrnWithoutType() {
             container.withDeployment("urn:mvn:org.slf4j:slf4j-api:1.7.30");
 
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
-            assertThat(getMountableFile().getResolvedPath()).endsWith(".m2/repository/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar");
+            then(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
+            then(getMountableFile().getResolvedPath()).endsWith(".m2/repository/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar");
         }
 
         @Test void shouldFailToGetDeploymentFromMavenUrnWithExtraElement() {
             Throwable throwable = catchThrowable(() ->
                 container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war:xxx"));
 
-            assertThat(throwable).isInstanceOf(IllegalArgumentException.class)
+            then(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
         }
 
@@ -157,17 +168,17 @@ public class JeeContainerBehavior {
             container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war",
                 namedAs("foo.war"));
 
-            assertThat(container.webContext()).isEqualTo("foo");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
-            assertThat(getMountableFile().getResolvedPath()).endsWith("/foo.war");
+            then(container.webContext()).isEqualTo("foo");
+            then(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
+            then(getMountableFile().getResolvedPath()).endsWith("/foo.war");
         }
 
         @Test void shouldAddOneLibrary() {
             container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war",
                 addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"));
 
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
-            assertThat(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
+            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            then(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
                 "META-INF/",
                 "META-INF/MANIFEST.MF",
                 "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
@@ -187,9 +198,9 @@ public class JeeContainerBehavior {
             container.withDeployment("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar",
                 addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
 
-            assertThat(container.getCopyToFileContainerPathMap())
+            then(container.getCopyToFileContainerPathMap())
                 .containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
-            assertThat(filesInZip(getMountableFile().getResolvedPath())).contains(
+            then(filesInZip(getMountableFile().getResolvedPath())).contains(
                 "WEB-INF/lib/slf4j-jdk14-1.7.30.jar"
             );
         }
@@ -199,8 +210,8 @@ public class JeeContainerBehavior {
                 addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"),
                 addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
 
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
-            assertThat(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
+            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            then(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
                 "META-INF/",
                 "META-INF/MANIFEST.MF",
                 "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
@@ -227,17 +238,17 @@ public class JeeContainerBehavior {
         @Test void shouldGetDeploymentFromMavenCentralUrl() {
             container.withDeployment("https://repo1.maven.org/maven2" + REPO_PATH);
 
-            assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured-" + VERSION);
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH_V);
-            assertThat(getMountableFile().getResolvedPath()).endsWith(WAR_V);
+            then(container.webContext()).isEqualTo("jolokia-war-unsecured-" + VERSION);
+            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH_V);
+            then(getMountableFile().getResolvedPath()).endsWith(WAR_V);
         }
 
         @Test void shouldFailToGetDeploymentFromMavenUrnNotDownloadable() {
             String url = "https://repo1.maven.org/maven2/org/jolokia/jolokia-war-unsecured/1.5.999"
-                + "/jolokia-war-unsecured-1.5.999.war";
+                         + "/jolokia-war-unsecured-1.5.999.war";
             Throwable throwable = catchThrowable(() -> container.withDeployment(url));
 
-            assertThat(throwable).isInstanceOf(IllegalStateException.class)
+            then(throwable).isInstanceOf(IllegalStateException.class)
                 .hasMessage("can't download " + url + ": 404 Not Found");
         }
 
@@ -245,9 +256,9 @@ public class JeeContainerBehavior {
             container.withDeployment("https://repo1.maven.org/maven2" + REPO_PATH,
                 namedAs("foo.war"));
 
-            assertThat(container.webContext()).isEqualTo("foo");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
-            assertThat(getMountableFile().getResolvedPath()).endsWith("/foo.war");
+            then(container.webContext()).isEqualTo("foo");
+            then(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
+            then(getMountableFile().getResolvedPath()).endsWith("/foo.war");
         }
     }
 
@@ -255,42 +266,42 @@ public class JeeContainerBehavior {
         @Test void shouldGetDeploymentFromLocalFile() {
             container.withDeployment("target/my-app.war");
 
-            assertThat(container.webContext()).isEqualTo("my-app");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/my-app.war");
-            assertThat(getMountableFile().getResolvedPath()).isEqualTo(System.getProperty("user.dir") + "/target/my-app.war");
+            then(container.webContext()).isEqualTo("my-app");
+            then(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/my-app.war");
+            then(getMountableFile().getResolvedPath()).isEqualTo(System.getProperty("user.dir") + "/target/my-app.war");
         }
 
         @Test void shouldGetDeploymentFromLocalFileUrl() {
             container.withDeployment("file://" + LOCAL_M2 + REPO_PATH);
 
-            assertThat(container.webContext()).isEqualTo("jolokia-war-unsecured-1.6.2");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH_V);
-            assertThat(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2 + REPO_PATH);
+            then(container.webContext()).isEqualTo("jolokia-war-unsecured-1.6.2");
+            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH_V);
+            then(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2 + REPO_PATH);
         }
 
         @Test void shouldGetDeploymentFromLocalFileWithoutVersion() {
             container.withDeployment("file:///foo/bar.war");
 
-            assertThat(container.webContext()).isEqualTo("bar");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/bar.war");
-            assertThat(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar.war");
+            then(container.webContext()).isEqualTo("bar");
+            then(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/bar.war");
+            then(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar.war");
         }
 
         @Test void shouldGetDeploymentFromLocalSnapshotFile() {
             container.withDeployment("file:///foo/bar-12.14.17345-SNAPSHOT.war");
 
-            assertThat(container.webContext()).isEqualTo("bar-12.14.17345-SNAPSHOT");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/bar-12.14.17345-SNAPSHOT.war");
-            assertThat(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar-12.14.17345-SNAPSHOT.war");
+            then(container.webContext()).isEqualTo("bar-12.14.17345-SNAPSHOT");
+            then(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/bar-12.14.17345-SNAPSHOT.war");
+            then(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar-12.14.17345-SNAPSHOT.war");
         }
 
         @Test void shouldModifyName() {
             container.withDeployment("file://" + LOCAL_M2 + REPO_PATH,
                 namedAs("foo.war"));
 
-            assertThat(container.webContext()).isEqualTo("foo");
-            assertThat(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
-            assertThat(getMountableFile().getResolvedPath()).endsWith("/foo.war");
+            then(container.webContext()).isEqualTo("foo");
+            then(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
+            then(getMountableFile().getResolvedPath()).endsWith("/foo.war");
         }
     }
 

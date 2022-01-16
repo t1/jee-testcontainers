@@ -54,27 +54,36 @@ As seen in the prototypical example above, you can install an application by cal
 
 Instead of a local file, you can also install from an URL. Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`.
 
-== Configuration
+== Container Image
 
-Set the system property `jee-testcontainer` to one of the following keys to select the corresponding container.
+Set the system property `jee-testcontainer` to one of the keys in the following table to select the corresponding container.
 Ideally you shouldn't have to care about what server your application runs on, or you may even want to test it in multiple containers.
 Then you can run your test suite in your CI pipeline with different system properties.
 
 You can append a tag to the `jee-testcontainer` separated by a colon `:`.
-This is often simply the version of the container; e.g. `wildfly:18.0.1.Final`.
+This is often simply the version of the container; e.g. `wildfly:25.0.1.Final`.
 
 [options="header",cols="15%,15%,40%,30%"]
 |=======================
 | Key | Container | Docker Image | Notes
-| `wildfly` | https://wildfly.org[WildFly] | https://hub.docker.com/r/jboss/wildfly[`jboss/wildfly`] | default container, not an 'official' image
+| `wildfly` | https://wildfly.org[WildFly] | https://hub.docker.com/r/jboss/wildfly[`jboss/wildfly`] | default container, not an 'official' image on Docker-Hub
 | `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] | add `server.xml` with features `javaee-8.0` and `microProfile-3.0`
 | `tomee` | https://tomee.apache.org[TomEE] | https://hub.docker.com/_/tomee[`tomee`] | Official image but currently outdated
 | `payara` | https://www.payara.fish[Payara] | https://hub.docker.com/r/payara/server-full[`payara`] | not an 'official' image
 // TODO support | `glassfish` | https://javaee.github.io/glassfish/[Glassfish] | https://hub.docker.com/_/glassfish[`glassfish`] | deprecated image!
 |=======================
 
-Set the system property `testcontainer-reuse` to `true` to let the container run as long as the config doesn't change.
-This feature is in beta of testcontainers.org (see https://github.com/testcontainers/testcontainers-java/pull/1781[PR-1781]).
+== Reuse
+
+You can reuse a running container instance for all tests as long as the config doesn't change, by calling `withReuse(true)`. This feature is marked as unstable from testcontainers.org. You can achieve the same by setting the system property `testcontainer-reuse` to `true`, which comes in handy when you need it only for certain launch configurations, i.e. local or on CI.
+
+== Ports
+
+By default, the main port exposed by the container (which accidentally is 8080 in all currently supported JEE servers) is published/bound to a random free port. You can bind it to a fixed port by calling `JeeContainer#withMainPortBoundToFixedPort(int hostPort)`. Or you can set the `testcontainer-with-main-port-bound-to-fixed-port` system property for the same effect.
+
+Similarly, you can publish any port by calling `JeeContainer#withPortBoundToFixedPort(int hostPort, int containerPort)`.
+
+Fixing port numbers may be convenient in some cases, but you shouldn't do this without a good reason.
 
 == Modifications
 

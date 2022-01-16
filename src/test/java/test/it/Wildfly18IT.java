@@ -9,7 +9,7 @@ import test.jolokia.JolokiaResponse;
 
 import javax.json.bind.JsonbBuilder;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.BDDAssertions.then;
 import static test.jolokia.TestData.VERSION;
 
 @WildFly
@@ -26,8 +26,8 @@ public class Wildfly18IT {
         JolokiaResponse response = JsonbBuilder.create().fromJson(jolokia.get(), JolokiaResponse.class);
 
         response.assertCurrent();
-        assertThat(response.getValue().getInfo().getProduct()).isEqualTo("WildFly Full");
-        assertThat(response.getValue().getInfo().getVendor()).isEqualTo("RedHat");
-        assertThat(response.getValue().getInfo().getVersion()).isEqualTo(WILDFLY_VERSION);
+        then(response.getValue().getInfo().getProduct()).isEqualTo("WildFly Full");
+        then(response.getValue().getInfo().getVendor()).isEqualTo("RedHat");
+        then(response.getValue().getInfo().getVersion()).isEqualTo(WILDFLY_VERSION);
     }
 }

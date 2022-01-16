@@ -21,6 +21,7 @@ import java.nio.file.Path;
 public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     static final Client CLIENT = ClientBuilder.newClient();
     public static final String CONTAINER_SELECTOR_PROPERTY = "jee-testcontainer";
+    public static final String FIX_MAIN_PORT_PROPERTY = "testcontainer-with-main-port-bound-to-fixed-port";
     public static final String TESTCONTAINER_REUSE_PROPERTY = "testcontainer-reuse";
 
     public static JeeContainer create() {
@@ -56,18 +57,20 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         withLogConsumer(new StdoutLogConsumer());
         withReuse(Boolean.getBoolean(TESTCONTAINER_REUSE_PROPERTY));
         addExposedPort(mainPort());
+        if (System.getProperties().containsKey(FIX_MAIN_PORT_PROPERTY))
+            withMainPortBoundToFixedPort(Integer.getInteger(FIX_MAIN_PORT_PROPERTY));
     }
 
     protected static String tagged(String image, String tag) {
         return (tag == null) ? image : (image + ":" + tag);
     }
 
-    public JeeContainer withFixedExposedPort(int hostPort, int containerPort) {
+    public JeeContainer withPortBoundToFixedPort(int hostPort, int containerPort) {
         super.addFixedExposedPort(hostPort, containerPort);
         return this;
     }
 
-    public JeeContainer withFixedExposedMainPort(int hostPort) {
+    public JeeContainer withMainPortBoundToFixedPort(int hostPort) {
         super.addFixedExposedPort(hostPort, mainPort());
         return this;
     }
