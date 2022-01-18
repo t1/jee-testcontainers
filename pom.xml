@@ -4,7 +4,7 @@
 
     <groupId>com.github.t1</groupId>
     <artifactId>jee-testcontainers</artifactId>
-    <version>1.7.3</version>
+    <version>1.7.4-SNAPSHOT</version>
     <name>jee-testcontainers</name>
     <description>testcontainers.org for Jakarta EE application servers</description>
     <url>https://github.com/t1/jee-testcontainers</url>
@@ -40,7 +40,7 @@
     </licenses>
     <scm>
         <developerConnection>scm:git:https://github.com/t1/jee-testcontainers.git</developerConnection>
-        <tag>v1.7.3</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/t1/jee-testcontainers.git</url>
     </scm>
 
