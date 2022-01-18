@@ -124,7 +124,7 @@
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
-                    <goals>deploy nexus-staging:release</goals>
+                    <goals>deploy nexus-staging:close</goals>
                 </configuration>
             </plugin>
             <plugin>
