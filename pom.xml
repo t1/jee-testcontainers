@@ -63,6 +63,8 @@
                     <includes>
                         <include>*Behavior</include>
                     </includes>
+                    <reportFormat>plain</reportFormat>
+                    <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
             <plugin>
@@ -78,6 +80,10 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <reportFormat>plain</reportFormat>
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
