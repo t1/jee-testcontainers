@@ -14,4 +14,9 @@ public class WildflyContainer extends JeeContainer {
         withContainerDeploymentPath("/opt/jboss/wildfly/standalone/deployments/");
         waitingFor(new LogMessageWaitStrategy().withRegEx(WAR_DEPLOYED_MESSAGE));
     }
+
+    @Override public String webContext() {
+        String webContext = super.webContext();
+        return "ROOT".equals(webContext) ? "" : webContext;
+    }
 }

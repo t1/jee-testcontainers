@@ -10,6 +10,7 @@ public class JolokiaResponse {
     JolokiaResponseValue value;
 
     public void assertCurrent() {
+        then(value).isNotNull();
         then(value.getAgent()).isEqualTo(VERSION);
         then(value.getProtocol()).isEqualTo("7.2");
     }
