@@ -77,16 +77,25 @@ public class JeeContainerBehavior {
                 JeeContainer container = JeeContainer.create();
 
                 then(container).isInstanceOf(WildflyContainer.class);
-                then(container.getDockerImageName()).isEqualTo("jboss/wildfly:latest");
+                then(container.getDockerImageName()).isEqualTo("rdohna/wildfly:latest");
             });
         }
 
-        @Test void shouldSelectVersionBySystemProperty() {
-            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly:18.0.1.Final", () -> {
+        @Test void shouldSelectImageBaseAndVersionBySystemProperty() {
+            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "jboss/wildfly:18.0.1.Final", () -> {
                 JeeContainer container = JeeContainer.create();
 
                 then(container).isInstanceOf(WildflyContainer.class);
                 then(container.getDockerImageName()).isEqualTo("jboss/wildfly:18.0.1.Final");
+            });
+        }
+
+        @Test void shouldSelectVersionBySystemProperty() {
+            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly:26.0.1.Final-jdk11", () -> {
+                JeeContainer container = JeeContainer.create();
+
+                then(container).isInstanceOf(WildflyContainer.class);
+                then(container.getDockerImageName()).isEqualTo("rdohna/wildfly:26.0.1.Final-jdk11");
             });
         }
 
@@ -95,6 +104,7 @@ public class JeeContainerBehavior {
                 JeeContainer container = JeeContainer.create();
 
                 then(container).isInstanceOf(OpenLibertyContainer.class);
+                then(container.getDockerImageName()).isEqualTo("open-liberty:latest");
             });
         }
 
@@ -103,6 +113,7 @@ public class JeeContainerBehavior {
                 JeeContainer container = JeeContainer.create();
 
                 then(container).isInstanceOf(TomEeContainer.class);
+                then(container.getDockerImageName()).isEqualTo("tomee:latest");
             });
         }
 
@@ -111,6 +122,7 @@ public class JeeContainerBehavior {
                 JeeContainer container = JeeContainer.create();
 
                 then(container).isInstanceOf(PayaraContainer.class);
+                then(container.getDockerImageName()).isEqualTo("payara/server-full:latest");
             });
         }
 

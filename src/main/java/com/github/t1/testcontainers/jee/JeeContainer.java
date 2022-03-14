@@ -3,6 +3,7 @@ package com.github.t1.testcontainers.jee;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
 import javax.ws.rs.client.Client;
@@ -25,35 +26,34 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     public static final String TESTCONTAINER_REUSE_PROPERTY = "testcontainer-reuse";
 
     public static JeeContainer create() {
-        switch (containerKey()) {
+        DockerImageName imageName = imageName();
+        String repository = imageName.getRepository();
+        String type = (repository.contains("/")) ? repository.split("/", 2)[1] : repository;
+        switch (type) {
             case "wildfly":
-                return new WildflyContainer();
+                return new WildflyContainer(imageName);
             case "open-liberty":
-                return new OpenLibertyContainer();
+                return new OpenLibertyContainer(imageName);
             case "tomee":
-                return new TomEeContainer();
+                return new TomEeContainer(imageName);
             case "payara":
-                return new PayaraContainer();
+                return new PayaraContainer(imageName);
             default:
                 throw new IllegalArgumentException(
                     "unsupported container type '" + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
         }
     }
 
-    private static String containerKey() {return containerSelector()[0];}
-
-    private static String containerTag() {return containerSelector().length == 1 ? null : containerSelector()[1];}
-
-    private static String[] containerSelector() {
-        return System.getProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly").split(":", 2);
+    private static DockerImageName imageName() {
+        return DockerImageName.parse(System.getProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly"));
     }
 
     private String containerDeploymentPath;
 
     private Deployable deployable;
 
-    public JeeContainer(String image) {
-        super(tagged(image, containerTag()));
+    public JeeContainer(DockerImageName image) {
+        super(image);
         withLogConsumer(new StdoutLogConsumer());
         withReuse(Boolean.getBoolean(TESTCONTAINER_REUSE_PROPERTY));
         addExposedPort(mainPort());
