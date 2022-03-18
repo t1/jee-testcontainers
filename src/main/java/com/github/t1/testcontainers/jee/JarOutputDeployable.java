@@ -56,7 +56,8 @@ class JarOutputDeployable extends Deployable {
         Path path = deployable.getLocalPath();
         // opening the jar as a file system loses the file permission for group and other, but we need that
         Set<PosixFilePermission> permissions = getPosixFilePermissions(path);
-        try (FileSystem jar = FileSystems.newFileSystem(path, null)) {
+        //noinspection RedundantCast // the cast is required for JDK 13+
+        try (FileSystem jar = FileSystems.newFileSystem(path, (ClassLoader) null)) {
             operation.accept(jar);
         }
         setPosixFilePermissions(path, permissions);
