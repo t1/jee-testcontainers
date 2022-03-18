@@ -39,7 +39,8 @@ public class TestTools {
         }
     }
 
-    public static List<String> portBindings(GenericContainer<?> container) throws NoSuchFieldException, IllegalAccessException {
+    @SneakyThrows(ReflectiveOperationException.class)
+    public static List<String> portBindings(GenericContainer<?> container) {
         Field portBindings = GenericContainer.class.getDeclaredField("portBindings");
         portBindings.setAccessible(true);
         //noinspection unchecked

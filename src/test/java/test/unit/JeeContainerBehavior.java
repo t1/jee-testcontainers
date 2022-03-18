@@ -17,6 +17,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static com.github.t1.testcontainers.jee.AddLibMod.addLib;
+import static com.github.t1.testcontainers.jee.ConfigMod.config;
 import static com.github.t1.testcontainers.jee.JeeContainer.CONTAINER_SELECTOR_PROPERTY;
 import static com.github.t1.testcontainers.jee.JeeContainer.FIX_MAIN_PORT_PROPERTY;
 import static com.github.t1.testcontainers.jee.JeeContainer.TESTCONTAINER_REUSE_PROPERTY;
@@ -50,6 +51,12 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldConfigureTestcontainerReuse() {
+            JeeContainer container = JeeContainer.create().withReuse(true);
+
+            then(container.isShouldBeReused()).isTrue();
+        }
+
+        @Test void shouldConfigureTestcontainerReuseBySystemProperty() {
             withSystemProperty(TESTCONTAINER_REUSE_PROPERTY, "true", () -> {
                 JeeContainer container = JeeContainer.create();
 
@@ -57,7 +64,23 @@ public class JeeContainerBehavior {
             });
         }
 
-        @Test void shouldConfigureTestcontainerFixedMainPort() {
+        @Test void shouldConfigureTestcontainerFixedPort() {
+            int port = 32894576;
+
+            JeeContainer container = JeeContainer.create().withPortBoundToFixedPort(port, 9990);
+
+            then(TestTools.portBindings(container)).containsExactly(port + ":9990/tcp");
+        }
+
+        @Test void shouldConfigureTestcontainerFixedMainPortByWithMethod() {
+            int port = 32894576;
+
+            JeeContainer container = JeeContainer.create().withMainPortBoundToFixedPort(port);
+
+            then(TestTools.portBindings(container)).containsExactly(port + ":8080/tcp");
+        }
+
+        @Test void shouldConfigureTestcontainerFixedMainPortBySystemProperty() {
             Integer port = 32894576;
             withSystemProperty(FIX_MAIN_PORT_PROPERTY, port.toString(), () -> {
                 JeeContainer container = JeeContainer.create();
@@ -236,6 +259,28 @@ public class JeeContainerBehavior {
                 "WEB-INF/lib/json-simple-1.1.1.jar",
                 "WEB-INF/lib/slf4j-api-1.7.30.jar",
                 "WEB-INF/lib/slf4j-jdk14-1.7.30.jar",
+                "WEB-INF/web.xml"
+            );
+        }
+
+        @Test void shouldAddOneConfig() {
+            container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war",
+                config("foo", "bar"));
+
+            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            then(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
+                "META-INF/",
+                "META-INF/MANIFEST.MF",
+                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
+                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.xml",
+                "WEB-INF/",
+                "WEB-INF/classes/",
+                "WEB-INF/classes/META-INF/",
+                "WEB-INF/classes/META-INF/microprofile-config.properties",
+                "WEB-INF/lib/",
+                "WEB-INF/lib/jolokia-core-1.6.2.jar",
+                "WEB-INF/lib/jolokia-jsr160-1.6.2.jar",
+                "WEB-INF/lib/json-simple-1.1.1.jar",
                 "WEB-INF/web.xml"
             );
         }

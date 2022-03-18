@@ -1,6 +1,7 @@
 = JEE Testcontainers image:https://maven-badges.herokuapp.com/maven-central/com.github.t1/jee-testcontainers/badge.svg[link=https://search.maven.org/artifact/com.github.t1/jee-testcontainers] image:https://github.com/t1/jee-testcontainers/actions/workflows/maven.yml/badge.svg[link=https://github.com/t1/jee-testcontainers/actions/workflows/maven.yml]
 
-Simply start and stop Jakarta EE containers and deploy applications for your integration tests. This is an extension to https://testcontainers.org[Testcontainers] for Jakarta EE application servers, so Docker is used under the hood, but you don't need to write, e.g., a Dockerfile.
+Simply start and stop Jakarta EE containers and deploy applications for your integration tests.
+This is an extension to https://testcontainers.org[Testcontainers] for Jakarta EE application servers, so Docker is used under the hood, but you don't need to write, e.g., a Dockerfile.
 
 Prototypical Example:
 
@@ -52,7 +53,8 @@ The console output of the container is piped to the test's output, STDOUT in gre
 
 As seen in the prototypical example above, you can install an application by calling `.withDeployment(<file>)`.
 
-Instead of a local file, you can also install from an URL. Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`.
+Instead of a local file, you can also install from an URL.
+Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`.
 
 == Container Image
 
@@ -75,11 +77,15 @@ This is often simply the version of the container; e.g. `wildfly:25.0.1.Final`.
 
 == Reuse
 
-You can reuse a running container instance for all tests as long as the config doesn't change, by calling `withReuse(true)`. This feature is marked as unstable from testcontainers.org. You can achieve the same by setting the system property `testcontainer-reuse` to `true`, which comes in handy when you need it only for certain launch configurations, i.e. local or on CI.
+You can reuse a running container instance for all tests as long as the config doesn't change, by calling `withReuse(true)`.
+This feature is marked as unstable from testcontainers.org.
+You can achieve the same by setting the system property `testcontainer-reuse` to `true`, which comes in handy when you need it only for certain launch configurations, i.e. local or on CI.
 
 == Ports
 
-By default, the main port exposed by the container (which accidentally is 8080 in all currently supported JEE servers) is published/bound to a random free port. You can bind it to a fixed port by calling `JeeContainer#withMainPortBoundToFixedPort(int hostPort)`. Or you can set the `testcontainer-with-main-port-bound-to-fixed-port` system property for the same effect.
+By default, the main port exposed by the container (which accidentally is 8080 in all currently supported JEE servers) is published/bound to a random free port.
+You can bind it to a fixed port by calling `JeeContainer#withMainPortBoundToFixedPort(int hostPort)`.
+Or you can set the `testcontainer-with-main-port-bound-to-fixed-port` system property for the same effect.
 
 Similarly, you can publish any port by calling `JeeContainer#withPortBoundToFixedPort(int hostPort, int containerPort)`.
 
@@ -87,7 +93,8 @@ Fixing port numbers may be convenient in some cases, but you shouldn't do this w
 
 == Modifications
 
-You can modify the deployable in two ways. You can have multiple and repeated modification to, e.g., rename the file and add multiple libraries.
+You can modify the deployable in two ways.
+You can have multiple and repeated modification to, e.g., rename the file and add multiple libraries.
 
 === Rename
 
@@ -114,6 +121,22 @@ public class MyAppIT {
         .withDeployment("target/my-app.war", addLib("urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war"));
 }
 ---------------------------------------------------------------
+
+=== Add Config
+
+[source,java]
+---------------------------------------------------------------
+import static com.github.t1.testcontainers.jee.ConfigMod.config;
+
+@Testcontainers
+public class MyAppIT {
+    @Container static JeeContainer CONTAINER = JeeContainer.create()
+        .withDeployment("target/my-app.war", config("foo", "bar"));
+}
+---------------------------------------------------------------
+
+Configure the https://microprofile.io/project/eclipse/microprofile-config[MP Config] key `foo` to be `bar`.
+Creates or appends to `WEB-INF/classes/META-INF/microprofile-config.properties`.
 
 == Limitations
 
