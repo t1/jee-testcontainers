@@ -19,19 +19,18 @@ import static java.nio.file.Files.setPosixFilePermissions;
 
 @Slf4j
 @RequiredArgsConstructor
-class JarOutputDeployable extends Deployable {
-    static JarOutputDeployable of(Deployable deployable) {
-        return (deployable instanceof JarOutputDeployable)
-            ? (JarOutputDeployable) deployable
-            : new JarOutputDeployable(Deployable.copyOf(deployable));
+class JarDeployable extends Deployable {
+    static JarDeployable of(Deployable deployable) {
+        return (deployable instanceof JarDeployable)
+            ? (JarDeployable) deployable
+            : new JarDeployable(Deployable.copyOf(deployable));
     }
 
     private final Deployable deployable;
     private final Map<Class<? extends ModStore>, ModStore> mods = new LinkedHashMap<>();
-    private boolean done = false;
 
     @Override public String toString() {
-        return "JarOutputDeployable[" + deployable + ":" + mods + "]";
+        return "JarDeployable[" + deployable + ":" + mods + "]";
     }
 
     public <T extends ModStore> T mod(Class<T> type) {
@@ -44,10 +43,7 @@ class JarOutputDeployable extends Deployable {
     @Override public String getFileName() {return deployable.getFileName();}
 
     @Override public Path getLocalPath() {
-        if (!done) {
-            mods.values().forEach(mod -> inJarFile(mod::apply));
-            done = true;
-        }
+        mods.values().forEach(mod -> inJarFile(mod::apply));
         return deployable.getLocalPath();
     }
 

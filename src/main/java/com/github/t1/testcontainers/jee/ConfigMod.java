@@ -26,9 +26,7 @@ public @Value class ConfigMod implements Mod {
     String value;
 
     @Override public Deployable apply(Deployable deployable) {
-        JarOutputDeployable jarOutputDeployable = JarOutputDeployable.of(deployable);
-        jarOutputDeployable.mod(ConfigModStore.class).put(key, value);
-        return jarOutputDeployable;
+        return with(deployable, ConfigModStore.class, d -> d.put(key, value));
     }
 
     public static class ConfigModStore implements ModStore {

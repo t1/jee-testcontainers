@@ -1,7 +1,9 @@
 package com.github.t1.testcontainers.jee;
 
+import com.github.t1.testcontainers.tools.DeployableBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import org.slf4j.event.Level;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
@@ -83,6 +85,10 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         return this;
     }
 
+    public JeeContainer withDeployment(DeployableBuilder builder, Mod... mods) {
+        return withDeployment(builder.build(), mods);
+    }
+
     public JeeContainer withDeployment(String deployableString, Mod... mods) {
         return withDeployment(URI.create(deployableString), mods);
     }
@@ -94,6 +100,15 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         Path localPath = this.deployable.getLocalPath();
         log.info("deploy {} to {}", localPath, containerPath());
         withCopyFileToContainer(MountableFile.forHostPath(localPath), containerPath());
+        return self();
+    }
+
+    public JeeContainer withLogLevel(Class<?> loggerClass, Level level) {
+        return withLogLevel(loggerClass.getName(), level);
+    }
+
+    public JeeContainer withLogLevel(String loggerName, Level level) {
+        log.warn("withLogLevel is not supported by {}", getClass().getName());
         return self();
     }
 

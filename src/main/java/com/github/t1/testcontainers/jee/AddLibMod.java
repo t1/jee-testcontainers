@@ -23,9 +23,7 @@ public @Value class AddLibMod implements Mod {
     URI name;
 
     @Override public Deployable apply(Deployable deployable) {
-        JarOutputDeployable jarOutputDeployable = JarOutputDeployable.of(deployable);
-        jarOutputDeployable.mod(AddLibModStore.class).add(Deployable.create(name));
-        return jarOutputDeployable;
+        return with(deployable, AddLibModStore.class, d -> d.add(Deployable.create(name)));
     }
 
     public static class AddLibModStore implements ModStore {
