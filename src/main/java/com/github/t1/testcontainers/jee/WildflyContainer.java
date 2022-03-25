@@ -40,7 +40,7 @@ public class WildflyContainer extends JeeContainer {
     }
 
     @Override public JeeContainer withLogLevel(String loggerName, Level level) {
-        withCli("/subsystem=logging/logger=" + loggerName.replaceAll("\\$", "\\$") + ":add(level=" + level + ")");
+        withCli("/subsystem=logging/logger=" + loggerName.replace("$", "\\$") + ":add(level=" + level + ")");
         return self();
     }
 
