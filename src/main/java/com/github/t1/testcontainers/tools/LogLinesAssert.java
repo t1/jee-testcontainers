@@ -6,9 +6,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.github.t1.testcontainers.tools.LogLine.parseLines;
+
 @SuppressWarnings("UnusedReturnValue")
 public class LogLinesAssert<SELF extends LogLinesAssert<SELF, ACTUAL>, ACTUAL extends Iterator<LogLine>>
     extends AbstractAssert<SELF, ACTUAL> {
+    @SuppressWarnings("unchecked")
+    public LogLinesAssert(String actual) {this((ACTUAL) parseLines(actual));}
+
     public LogLinesAssert(ACTUAL actual) {this(actual, LogLinesAssert.class);}
 
     protected LogLinesAssert(ACTUAL actual, Class<?> selfType) {super(actual, selfType);}
