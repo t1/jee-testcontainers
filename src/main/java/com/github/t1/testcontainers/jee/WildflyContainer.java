@@ -2,6 +2,7 @@ package com.github.t1.testcontainers.jee;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import lombok.SneakyThrows;
+import org.slf4j.Logger;
 import org.slf4j.event.Level;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.Transferable;
@@ -39,7 +40,7 @@ public class WildflyContainer extends JeeContainer {
     }
 
     @Override public JeeContainer withLogLevel(String loggerName, Level level) {
-        withCli("/subsystem=logging/logger=" + loggerName + ":add(level=" + level + ")");
+        withCli("/subsystem=logging/logger=" + loggerName.replaceAll("\\$", "\\$") + ":add(level=" + level + ")");
         return self();
     }
 
@@ -58,8 +59,17 @@ public class WildflyContainer extends JeeContainer {
         String script = String.join("\n", cli);
         String containerPath = "/tmp/" + UUID.randomUUID() + ".cli";
         copyFileToContainer(Transferable.of(script.getBytes(UTF_8)), containerPath);
-        execInContainer("bin/jboss-cli.sh", "--connect", "--file=" + containerPath);
-        logger().debug("cli took {}", Duration.between(start, Instant.now()));
+
+        ExecResult execResult = execInContainer("bin/jboss-cli.sh", "--connect", "--file=" + containerPath);
+
+        Logger logger = logger();
+        logger.debug("start cli");
+        if (!execResult.getStdout().isEmpty()) logger.debug(execResult.getStdout());
+        if (!execResult.getStderr().isEmpty()) logger.debug(execResult.getStderr());
+        logger.debug("cli took {}", Duration.between(start, Instant.now()));
+        if (execResult.getExitCode() != 0) {
+            throw new RuntimeException("cli failed [" + execResult.getExitCode() + "]");
+        }
     }
 
     @Override public String webContext() {
