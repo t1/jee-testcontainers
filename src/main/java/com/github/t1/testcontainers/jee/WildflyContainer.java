@@ -55,6 +55,7 @@ public class WildflyContainer extends JeeContainer {
 
     @SneakyThrows({IOException.class, InterruptedException.class})
     private void execCli() {
+        if (cli.isEmpty()) return;
         Instant start = Instant.now();
         String script = String.join("\n", cli);
         String containerPath = "/tmp/" + UUID.randomUUID() + ".cli";
