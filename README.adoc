@@ -138,10 +138,19 @@ public class MyAppIT {
 Configure the https://microprofile.io/project/eclipse/microprofile-config[MP Config] key `foo` to be `bar`.
 Creates or appends to `WEB-INF/classes/META-INF/microprofile-config.properties`.
 
-== Limitations
+== Container Configuration
 
-You can't currently configure your application, e.g. by adding data sources.
-I will add that when I need it, which may be very soon ;-)
+You can configure the log level of a logger, e.g. by calling `withLogLevel`.
+At the moment, this only works for WildFly containers, but we're open for PRs 😀
+
+You can't currently configure anything else for your application, e.g. add data sources.
+I will add that as soon as I need it, but again: PRs are welcome.
 
 // TODO health wait strategy
-// TODO configure config values, data sources, message queues, loggers, etc.
+// TODO configure data sources, message queues, etc.
+
+== Building A Test Deployable
+
+There's a very limited support to build a `war` deployable from scratch.
+See the API of the https://github.com/t1/jee-testcontainers/blob/trunk/src/main/java/com/github/t1/testcontainers/tools/DeployableBuilder.java[DeployableBuilder] class for details.
+If you need more, maybe https://github.com/shrinkwrap/shrinkwrap[ShrinkWrap] can help, but I haven't tried that in combination, yet.
