@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <resteasy.version>4.5.9.Final</resteasy.version>
+        <resteasy.version>4.7.6.Final</resteasy.version>
         <maven-test-plugins.version>2.22.2</maven-test-plugins.version>
     </properties>
 
