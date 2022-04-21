@@ -16,7 +16,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <resteasy.version>4.5.9.Final</resteasy.version>
         <maven-test-plugins.version>2.22.2</maven-test-plugins.version>
     </properties>
 
@@ -156,7 +155,7 @@
             <groupId>org.eclipse.microprofile</groupId>
             <artifactId>microprofile</artifactId>
             <type>pom</type>
-            <version>4.0.1</version>
+            <version>4.1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -186,19 +185,19 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-client</artifactId>
-            <version>${resteasy.version}</version>
+            <version>5.0.3.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-client-microprofile</artifactId>
-            <version>${resteasy.version}</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse</groupId>
             <artifactId>yasson</artifactId>
-            <version>1.0.10</version>
+            <version>1.0.11</version>
             <scope>test</scope>
         </dependency>
         <dependency>
