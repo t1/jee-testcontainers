@@ -56,7 +56,7 @@ public class SetConfigPropertyIT {
 
 
     @Container static JeeContainer DEMO = WildflyContainer.create("26.0.1.Final-jdk11") // 'latest' contains GraphQL
-        .withDeployment("urn:mvn:com.github.t1:wunderbar.demo.order:2.4.4:war", // and this contains GraphQL, too
+        .withDeployment("urn:mvn:com.github.t1:wunderbar.demo.order:2.4.6:war", // and this contains GraphQL, too
             config("smallrye.graphql.errorExtensionFields", "exception")); // default contains `code`
 
     @Test void shouldAppendToExistingConfig() {
