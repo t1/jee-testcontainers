@@ -99,7 +99,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
             this.deployable = mod.apply(this.deployable);
         Path localPath = this.deployable.getLocalPath();
         log.info("deploy {} to {}", localPath, containerPath());
-        withCopyFileToContainer(MountableFile.forHostPath(localPath), containerPath());
+        withCopyToContainer(MountableFile.forHostPath(localPath), containerPath());
         return self();
     }
 
@@ -124,7 +124,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     }
 
     public URI baseUri() {
-        return URI.create("http://" + getContainerIpAddress() + ":" + getFirstMappedPort() + "/" + webContext() + "/");
+        return URI.create("http://" + getHost() + ":" + getFirstMappedPort() + "/" + webContext() + "/");
     }
 
     public String webContext() {

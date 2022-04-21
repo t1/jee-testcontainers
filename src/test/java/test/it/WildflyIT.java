@@ -5,6 +5,7 @@ import com.github.t1.testcontainers.jee.WildflyContainer;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import test.jolokia.JolokiaApi;
 import test.jolokia.JolokiaResponse;
 
 import javax.json.bind.JsonbBuilder;
@@ -15,7 +16,7 @@ import static test.jolokia.TestData.VERSION;
 @WildFly
 @Testcontainers
 public class WildflyIT {
-    @Container static JeeContainer CONTAINER = new WildflyContainer()
+    @Container static JeeContainer CONTAINER = WildflyContainer.create()
         .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
 
     @Test void shouldGetJolokiaResponse() {

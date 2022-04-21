@@ -1,4 +1,4 @@
-package test.it;
+package test.app;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;

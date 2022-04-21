@@ -25,6 +25,7 @@ import static com.github.t1.testcontainers.jee.NamedAsMod.namedAs;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.testcontainers.containers.PackageAccessUtil.copyToTransferableContainerPathMap;
 import static test.TestTools.withSystemProperty;
 import static test.jolokia.TestData.LOCAL_M2;
 import static test.jolokia.TestData.REPO_PATH;
@@ -164,7 +165,7 @@ public class JeeContainerBehavior {
             container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
 
             then(container.webContext()).isEqualTo("jolokia-war-unsecured");
-            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH);
             then(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2 + REPO_PATH);
         }
 
@@ -187,7 +188,7 @@ public class JeeContainerBehavior {
         @Test void shouldGetJarDeploymentFromMavenUrnWithoutType() {
             container.withDeployment("urn:mvn:org.slf4j:slf4j-api:1.7.30");
 
-            then(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
+            then(copyToTransferableContainerPathMap(container)).containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
             then(getMountableFile().getResolvedPath()).endsWith(".m2/repository/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar");
         }
 
@@ -204,7 +205,7 @@ public class JeeContainerBehavior {
                 namedAs("foo.war"));
 
             then(container.webContext()).isEqualTo("foo");
-            then(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
+            then(copyToTransferableContainerPathMap(container)).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
             then(getMountableFile().getResolvedPath()).endsWith("/foo.war");
         }
 
@@ -212,7 +213,7 @@ public class JeeContainerBehavior {
             container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war",
                 addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"));
 
-            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH);
             then(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
                 "META-INF/",
                 "META-INF/MANIFEST.MF",
@@ -233,7 +234,7 @@ public class JeeContainerBehavior {
             container.withDeployment("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar",
                 addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
 
-            then(container.getCopyToFileContainerPathMap())
+            then(copyToTransferableContainerPathMap(container))
                 .containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
             then(filesInZip(getMountableFile().getResolvedPath())).contains(
                 "WEB-INF/lib/slf4j-jdk14-1.7.30.jar"
@@ -245,7 +246,7 @@ public class JeeContainerBehavior {
                 addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"),
                 addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
 
-            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH);
             then(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
                 "META-INF/",
                 "META-INF/MANIFEST.MF",
@@ -267,7 +268,7 @@ public class JeeContainerBehavior {
             container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war",
                 config("foo", "bar"));
 
-            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH);
+            then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH);
             then(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
                 "META-INF/",
                 "META-INF/MANIFEST.MF",
@@ -288,7 +289,9 @@ public class JeeContainerBehavior {
 
     @SneakyThrows(IOException.class)
     private static List<String> filesInZip(String path) {
-        return new ZipFile(path).stream().map(ZipEntry::getName).sorted().collect(toList());
+        try (ZipFile zipFile = new ZipFile(path)) {
+            return zipFile.stream().map(ZipEntry::getName).sorted().collect(toList());
+        }
     }
 
     @Nested class MavenCentralUrl {
@@ -296,7 +299,7 @@ public class JeeContainerBehavior {
             container.withDeployment("https://repo1.maven.org/maven2" + REPO_PATH);
 
             then(container.webContext()).isEqualTo("jolokia-war-unsecured-" + VERSION);
-            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH_V);
+            then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH_V);
             then(getMountableFile().getResolvedPath()).endsWith(WAR_V);
         }
 
@@ -314,7 +317,7 @@ public class JeeContainerBehavior {
                 namedAs("foo.war"));
 
             then(container.webContext()).isEqualTo("foo");
-            then(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
+            then(copyToTransferableContainerPathMap(container)).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
             then(getMountableFile().getResolvedPath()).endsWith("/foo.war");
         }
     }
@@ -324,7 +327,7 @@ public class JeeContainerBehavior {
             container.withDeployment("target/my-app.war");
 
             then(container.webContext()).isEqualTo("my-app");
-            then(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/my-app.war");
+            then(copyToTransferableContainerPathMap(container)).containsValues(STANDALONE_DEPLOYMENTS + "/my-app.war");
             then(getMountableFile().getResolvedPath()).isEqualTo(System.getProperty("user.dir") + "/target/my-app.war");
         }
 
@@ -332,7 +335,7 @@ public class JeeContainerBehavior {
             container.withDeployment("file://" + LOCAL_M2 + REPO_PATH);
 
             then(container.webContext()).isEqualTo("jolokia-war-unsecured-1.6.2");
-            then(container.getCopyToFileContainerPathMap()).containsValues(TARGET_PATH_V);
+            then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH_V);
             then(getMountableFile().getResolvedPath()).isEqualTo(LOCAL_M2 + REPO_PATH);
         }
 
@@ -340,7 +343,7 @@ public class JeeContainerBehavior {
             container.withDeployment("file:///foo/bar.war");
 
             then(container.webContext()).isEqualTo("bar");
-            then(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/bar.war");
+            then(copyToTransferableContainerPathMap(container)).containsValues(STANDALONE_DEPLOYMENTS + "/bar.war");
             then(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar.war");
         }
 
@@ -348,7 +351,7 @@ public class JeeContainerBehavior {
             container.withDeployment("file:///foo/bar-12.14.17345-SNAPSHOT.war");
 
             then(container.webContext()).isEqualTo("bar-12.14.17345-SNAPSHOT");
-            then(container.getCopyToFileContainerPathMap()).containsValues(STANDALONE_DEPLOYMENTS + "/bar-12.14.17345-SNAPSHOT.war");
+            then(copyToTransferableContainerPathMap(container)).containsValues(STANDALONE_DEPLOYMENTS + "/bar-12.14.17345-SNAPSHOT.war");
             then(getMountableFile().getResolvedPath()).isEqualTo("/foo/bar-12.14.17345-SNAPSHOT.war");
         }
 
@@ -357,12 +360,12 @@ public class JeeContainerBehavior {
                 namedAs("foo.war"));
 
             then(container.webContext()).isEqualTo("foo");
-            then(container.getCopyToFileContainerPathMap()).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
+            then(copyToTransferableContainerPathMap(container)).containsValues("/opt/jboss/wildfly/standalone/deployments/foo.war");
             then(getMountableFile().getResolvedPath()).endsWith("/foo.war");
         }
     }
 
     private MountableFile getMountableFile() {
-        return container.getCopyToFileContainerPathMap().keySet().iterator().next();
+        return (MountableFile) copyToTransferableContainerPathMap(container).keySet().iterator().next();
     }
 }

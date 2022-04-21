@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import test.app.Ping;
+import test.app.REST;
 
 import javax.ws.rs.core.Response;
 
@@ -15,7 +17,7 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.INFO;
-import static test.it.CustomAssertions.thenLogsIn;
+import static test.CustomAssertions.thenLogsIn;
 
 @Slf4j
 @WildFly

@@ -15,7 +15,7 @@ import static test.jolokia.TestData.VERSION;
 @Payara
 @Testcontainers
 public class PayaraIT {
-    @Container static JeeContainer CONTAINER = new PayaraContainer()
+    @Container static JeeContainer CONTAINER = PayaraContainer.create()
         .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
 
     @Test void shouldGetJolokiaResponse() {

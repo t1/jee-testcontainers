@@ -4,8 +4,18 @@ import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.utility.DockerImageName;
 
 public class PayaraContainer extends JeeContainer {
+    public static PayaraContainer create() {return create(null);}
+
+    public static PayaraContainer create(String tag) {return create("payara/server-full", tag);}
+
+    public static PayaraContainer create(String image, String tag) {return new PayaraContainer(DockerImageName.parse(tagged(image, tag)));}
+
+    /** use {@link #create()} instead */
+    @Deprecated
     public PayaraContainer() {this((String) null);}
 
+    /** use {@link #create()} instead */
+    @Deprecated
     public PayaraContainer(String tag) {
         this(DockerImageName.parse(tagged("payara/server-full", tag)));
     }

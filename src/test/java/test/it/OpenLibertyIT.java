@@ -17,7 +17,7 @@ import static test.jolokia.TestData.VERSION;
 @OpenLiberty
 @Testcontainers
 public class OpenLibertyIT {
-    @Container static JeeContainer CONTAINER = new OpenLibertyContainer()
+    @Container static JeeContainer CONTAINER = OpenLibertyContainer.create()
         .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
 
     @Test void shouldGetJolokiaResponse() {

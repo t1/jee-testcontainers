@@ -1,4 +1,4 @@
-package test.it;
+package test.jolokia;
 
 import javax.ws.rs.GET;
 

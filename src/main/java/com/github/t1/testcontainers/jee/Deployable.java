@@ -25,7 +25,7 @@ public abstract class Deployable {
 
     public abstract String getFileName();
 
-    public static Deployable create(String deployable) { return create(URI.create(deployable)); }
+    public static Deployable create(String deployable) {return create(URI.create(deployable));}
 
     public static Deployable create(URI deployable) {
         switch (scheme(deployable)) {
@@ -80,7 +80,7 @@ public abstract class Deployable {
                 throw new IllegalArgumentException("unsupported urn scheme '" + split[0] + "'");
             if (split.length < 4 || split.length > 5)
                 throw new IllegalArgumentException("expected 4 or 5 elements in 'mvn' urn '" + deployment + "': " +
-                    "`urn:mvn:<group-id>:<artifact-id>:<version>[:<type>]`");
+                                                   "`urn:mvn:<group-id>:<artifact-id>:<version>[:<type>]`");
             this.groupId = split[1];
             this.artifactId = split[2];
             this.version = split[3];
@@ -149,13 +149,13 @@ public abstract class Deployable {
         private void download() {
             log.info("download " + uri + " to " + tempFile);
 
-            Response get = CLIENT.target(uri).request().buildGet().invoke();
-            if (get.getStatusInfo() != OK)
-                throw new IllegalStateException("can't download " + uri
-                    + ": " + get.getStatus() + " " + get.getStatusInfo());
-            InputStream inputStream = get.readEntity(InputStream.class);
+            try (Response get = CLIENT.target(uri).request().buildGet().invoke()) {
+                if (get.getStatusInfo() != OK)
+                    throw new IllegalStateException("can't download " + uri + ": " + get.getStatus() + " " + get.getStatusInfo());
+                InputStream inputStream = get.readEntity(InputStream.class);
 
-            copy(inputStream, tempFile);
+                copy(inputStream, tempFile);
+            }
         }
     }
 

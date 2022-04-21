@@ -7,10 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import test.app.Ping;
+import test.app.REST;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.bind.JsonbBuilder;
+import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.Response;
 
 import static com.github.t1.testcontainers.jee.ConfigMod.config;
@@ -52,18 +55,19 @@ public class SetConfigPropertyIT {
     }
 
 
-    @Container static JeeContainer DEMO = new WildflyContainer("26.0.1.Final-jdk11") // 'latest' contains GraphQL
+    @Container static JeeContainer DEMO = WildflyContainer.create("26.0.1.Final-jdk11") // 'latest' contains GraphQL
         .withDeployment("urn:mvn:com.github.t1:wunderbar.demo.order:2.4.4:war", // and this contains GraphQL, too
             config("smallrye.graphql.errorExtensionFields", "exception")); // default contains `code`
 
     @Test void shouldAppendToExistingConfig() {
-        Response response = DEMO.target().path("/graphql").request(APPLICATION_JSON_TYPE)
-            .post(entity("{\"query\": \"{order(id:\\\"unknown\\\"){id orderDate}}\"}", APPLICATION_JSON_TYPE));
+        Builder request = DEMO.target().path("/graphql").request(APPLICATION_JSON_TYPE);
+        try (Response response = request.post(entity("{\"query\": \"{order(id:\\\"unknown\\\"){id orderDate}}\"}", APPLICATION_JSON_TYPE))) {
 
-        then(response.getStatusInfo()).isEqualTo(OK);
-        JsonObject jsonObject = JsonbBuilder.create().fromJson(response.readEntity(String.class), JsonObject.class);
-        log.info("response: {}", jsonObject);
-        then(jsonObject.getValue("/errors/0/message")).isEqualTo(Json.createValue("no order with id unknown"));
-        then(jsonObject.getValue("/errors/0/extensions").asJsonObject().keySet()).containsExactly("exception");
+            then(response.getStatusInfo()).isEqualTo(OK);
+            JsonObject jsonObject = JsonbBuilder.create().fromJson(response.readEntity(String.class), JsonObject.class);
+            log.info("response: {}", jsonObject);
+            then(jsonObject.getValue("/errors/0/message")).isEqualTo(Json.createValue("no order with id unknown"));
+            then(jsonObject.getValue("/errors/0/extensions").asJsonObject().keySet()).containsExactly("exception");
+        }
     }
 }

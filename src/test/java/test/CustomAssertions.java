@@ -1,4 +1,4 @@
-package test.it;
+package test;
 
 import com.github.t1.testcontainers.jee.JeeContainer;
 import com.github.t1.testcontainers.tools.LogLinesAssert;

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import test.jolokia.JolokiaApi;
 import test.jolokia.JolokiaResponse;
 
 import javax.json.bind.JsonbBuilder;
@@ -21,7 +22,7 @@ import static test.jolokia.TestData.VERSION;
 public class Wildfly18IT {
     private static final String WILDFLY_VERSION = "18.0.1.Final";
 
-    @Container static JeeContainer CONTAINER = new WildflyContainer("jboss/wildfly", WILDFLY_VERSION)
+    @Container static JeeContainer CONTAINER = WildflyContainer.create("jboss/wildfly", WILDFLY_VERSION)
         .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
 
     @Test void shouldGetJolokiaResponse() {

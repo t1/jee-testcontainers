@@ -18,14 +18,27 @@ import java.util.UUID;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class WildflyContainer extends JeeContainer {
+    public static WildflyContainer create() {return create(null);}
+
+    public static WildflyContainer create(String tag) {return create("rdohna/wildfly", tag);}
+
+    public static WildflyContainer create(String image, String tag) {return new WildflyContainer(DockerImageName.parse(tagged(image, tag)));}
+
+
     private static final String WAR_DEPLOYED_MESSAGE = ".*WFLYSRV0010.*";
 
     private final List<String> cli = new ArrayList<>();
 
+    /** use {@link #create()} instead */
+    @Deprecated
     public WildflyContainer() {this((String) null);}
 
+    /** use {@link #create(String)} instead */
+    @Deprecated
     public WildflyContainer(String tag) {this("rdohna/wildfly", tag);}
 
+    /** use {@link #create(String, String)} instead */
+    @Deprecated
     public WildflyContainer(String image, String tag) {this(DockerImageName.parse(tagged(image, tag)));}
 
     public WildflyContainer(DockerImageName dockerImageName) {

@@ -16,7 +16,7 @@ import static test.jolokia.TestData.VERSION;
 @TomEE
 @Testcontainers
 public class TomEeIT {
-    @Container static JeeContainer CONTAINER = new TomEeContainer()
+    @Container static JeeContainer CONTAINER = TomEeContainer.create()
         .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
 
     @Test void shouldGetJolokiaResponse() {
