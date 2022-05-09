@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.slf4j.event.Level;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
@@ -109,6 +110,11 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
 
     public JeeContainer withLogLevel(String loggerName, Level level) {
         log.warn("withLogLevel is not supported by {}", getClass().getName());
+        return self();
+    }
+
+    public JeeContainer withDataSource(JdbcDatabaseContainer<?> db) {
+        log.warn("withDataSource is not supported by {}", getClass().getName());
         return self();
     }
 

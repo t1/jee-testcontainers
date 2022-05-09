@@ -63,12 +63,12 @@ Ideally you shouldn't have to care about what server your application runs on, o
 Then you can run your test suite in your CI pipeline with different system properties.
 
 You can append a tag to the `jee-testcontainer` separated by a colon `:`.
-This is often simply the version of the container; e.g. `wildfly:25.0.1.Final`.
+This is often simply the version of the container; e.g. `wildfly:26.0.1.Final`.
 
 [options="header",cols="15%,15%,40%,30%"]
 |=======================
 | Key | Container | Docker Image | Notes
-| `wildfly` | https://wildfly.org[WildFly] | https://hub.docker.com/r/jboss/wildfly[`jboss/wildfly`] | default container, not an 'official' image on Docker-Hub
+| `wildfly` | https://wildfly.org[WildFly] | https://hub.docker.com/repository/docker/rdohna/wildfly[`rdohna/wildfly`] | default container, not an 'official' image on Docker-Hub, but mine
 | `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] | we add `server.xml` with features `javaee-8.0` and `microProfile-3.0`
 | `tomee` | https://tomee.apache.org[TomEE] | https://hub.docker.com/_/tomee[`tomee`] | Official image
 | `payara` | https://www.payara.fish[Payara] | https://hub.docker.com/r/payara/server-full[`payara`] | not an 'official' image on Docker-Hub
@@ -140,14 +140,18 @@ Creates or appends to `WEB-INF/classes/META-INF/microprofile-config.properties`.
 
 == Container Configuration
 
-You can configure the log level of a logger, e.g. by calling `withLogLevel`.
-At the moment, this only works for WildFly containers, but we're open for PRs 😀
+You can configure the log level of a logger, e.g. by calling `withLogLevel`
+(at the moment, this only works for WildFly containers, but we're open for PRs 😀).
 
-You can't currently configure anything else for your application, e.g. add data sources.
-I will add that as soon as I need it, but again: PRs are welcome.
+You can also configure a data source by calling `withDataSource(DB)`, where `DB` is a `JdbcDatabaseContainer` (currently only `PostgreSQLContainer` and only on `WildFly`).
+
+For `WildFly`, you can also call arbitrary `CLI` commands by calling `withCli`.
+
+Apart from that, you can't currently configure anything else for your application, e.g. add message queues.
+I will add such things whenever I need it, but again: PRs are welcome.
 
 // TODO health wait strategy
-// TODO configure data sources, message queues, etc.
+// TODO configure message queues, etc.
 
 == Building A Test Deployable
 

@@ -4,7 +4,7 @@
 
     <groupId>com.github.t1</groupId>
     <artifactId>jee-testcontainers</artifactId>
-    <version>1.9.1-SNAPSHOT</version>
+    <version>1.10.0-SNAPSHOT</version>
     <name>jee-testcontainers</name>
     <description>testcontainers.org for Jakarta EE application servers</description>
     <url>https://github.com/t1/jee-testcontainers</url>
@@ -17,6 +17,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <maven-test-plugins.version>2.22.2</maven-test-plugins.version>
+        <org.testcontainers.version>1.17.1</org.testcontainers.version>
     </properties>
 
     <distributionManagement>
@@ -162,13 +163,18 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>1.17.1</version>
+            <version>${org.testcontainers.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>junit-jupiter-api</artifactId>
                     <groupId>org.junit.jupiter</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${org.testcontainers.version}</version>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>

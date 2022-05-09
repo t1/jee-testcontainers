@@ -27,7 +27,6 @@ public class ConfigureLogIT {
         return war("ping").withClasses(Ping.class, REST.class);
     }
 
-
     @Container static JeeContainer PING = JeeContainer.create()
         .withDeployment(buildPing())
         .withLogLevel(Ping.class, DEBUG);
