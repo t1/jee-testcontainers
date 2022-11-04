@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        jdk: [ 8, 11, 17 ]
+        jdk: [ 11, 17 ]
 
     runs-on: ubuntu-latest
 
