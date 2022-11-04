@@ -1,39 +1,37 @@
 package test.it;
 
 import com.github.t1.testcontainers.jee.JeeContainer;
-import com.github.t1.testcontainers.tools.DeployableBuilder;
 import com.github.t1.testcontainers.tools.LogLine;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import test.app.Ping;
-import test.app.REST;
 
-import javax.ws.rs.core.Response;
-
-import static com.github.t1.testcontainers.tools.DeployableBuilder.war;
-import static javax.ws.rs.core.Response.Status.OK;
+import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.INFO;
 import static test.CustomAssertions.thenLogsIn;
+import static test.TestTools.JAKARTA_IMAGE;
+import static test.TestTools.pingWar;
 
 @Slf4j
 @WildFly
 @Testcontainers
 public class ConfigureLogIT {
-    static DeployableBuilder buildPing() {
-        return war("ping").withClasses(Ping.class, REST.class);
-    }
 
-    @Container static JeeContainer PING = JeeContainer.create()
-        .withDeployment(buildPing())
+    @Container static JeeContainer PING = JeeContainer.create(JAKARTA_IMAGE)
+        .withDeployment(pingWar())
         .withLogLevel(Ping.class, DEBUG);
 
     @Test void shouldLogInfo() {
-        Response response = PING.target().path("/ping").request().get();
+        var webTarget = PING.target().path("/ping");
 
+        Response response = webTarget.request().get();
+
+        then(webTarget.getUri()).hasPath("/ping/ping");
         then(response.getStatusInfo()).isEqualTo(OK);
         thenLogsIn(PING).hasFollowingMessage("got pinged");
         thenLogsIn(PING).hasFollowing(LogLine.message("got pinged")

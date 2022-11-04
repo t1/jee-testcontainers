@@ -63,7 +63,7 @@ Ideally you shouldn't have to care about what server your application runs on, o
 Then you can run your test suite in your CI pipeline with different system properties.
 
 You can append a tag to the `jee-testcontainer` separated by a colon `:`.
-This is often simply the version of the container; e.g. `wildfly:26.0.1.Final`.
+This is often simply the version of the container; e.g. `wildfly:27.0.0.Final`.
 
 [options="header",cols="15%,15%,40%,30%"]
 |=======================

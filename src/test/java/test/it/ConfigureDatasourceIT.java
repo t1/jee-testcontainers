@@ -3,6 +3,7 @@ package test.it;
 import com.github.t1.testcontainers.jee.JeeContainer;
 import com.github.t1.testcontainers.jee.WildflyContainer;
 import com.github.t1.testcontainers.tools.DeployableBuilder;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.Network;
@@ -13,11 +14,10 @@ import test.app.DAO;
 import test.app.PgSettings;
 import test.app.REST;
 
-import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 import static com.github.t1.testcontainers.tools.DeployableBuilder.war;
-import static javax.ws.rs.core.Response.Status.OK;
+import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.BDDAssertions.then;
 
 @Slf4j
@@ -40,7 +40,7 @@ public class ConfigureDatasourceIT {
         .withNetwork(NETWORK)
         .withNetworkAliases("db");
 
-    @Container static JeeContainer APP = WildflyContainer.create()
+    @Container static JeeContainer APP = WildflyContainer.create("rdohna/wildfly", "27.0-jdk17")
         .withDataSource(DB)
         .withDeployment(buildApp())
         .withNetwork(NETWORK);

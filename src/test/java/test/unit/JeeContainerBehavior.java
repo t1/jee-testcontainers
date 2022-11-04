@@ -115,11 +115,11 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldSelectVersionBySystemProperty() {
-            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly:26.0.1.Final-jdk11", () -> {
+            withSystemProperty(CONTAINER_SELECTOR_PROPERTY, "rdohna/wildfly:26.1.2.Final-jdk11", () -> {
                 JeeContainer container = JeeContainer.create();
 
                 then(container).isInstanceOf(WildflyContainer.class);
-                then(container.getDockerImageName()).isEqualTo("rdohna/wildfly:26.0.1.Final-jdk11");
+                then(container.getDockerImageName()).isEqualTo("rdohna/wildfly:26.1.2.Final-jdk11");
             });
         }
 

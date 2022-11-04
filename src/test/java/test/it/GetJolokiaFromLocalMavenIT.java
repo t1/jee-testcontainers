@@ -8,7 +8,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import test.jolokia.JolokiaResponse;
 
-import javax.json.bind.JsonbBuilder;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -17,8 +16,9 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static java.nio.file.FileVisitResult.CONTINUE;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static test.TestTools.JSONB;
 import static test.jolokia.TestData.LOCAL_M2;
 import static test.jolokia.TestData.VERSION;
 
@@ -40,7 +40,7 @@ public class GetJolokiaFromLocalMavenIT {
         Path dir = Paths.get(LOCAL_M2, "org/jolokia/jolokia-war-unsecured", VERSION);
         if (Files.exists(dir)) {
             log.warn("deleting {}", dir);
-            Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(dir, new SimpleFileVisitor<>() {
                 @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     Files.deleteIfExists(file);
                     return CONTINUE;
@@ -53,7 +53,7 @@ public class GetJolokiaFromLocalMavenIT {
     @Test void shouldGetJolokiaResponse() {
         String string = CONTAINER.target().request(APPLICATION_JSON_TYPE).get(String.class);
 
-        JolokiaResponse response = JsonbBuilder.create().fromJson(string, JolokiaResponse.class);
+        JolokiaResponse response = JSONB.fromJson(string, JolokiaResponse.class);
 
         response.assertCurrent();
     }

@@ -7,9 +7,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import test.jolokia.JolokiaResponse;
 
-import javax.json.bind.JsonbBuilder;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static test.TestTools.JSONB;
 import static test.jolokia.TestData.VERSION;
 
 @Payara
@@ -21,7 +20,7 @@ public class PayaraIT {
     @Test void shouldGetJolokiaResponse() {
         String string = CONTAINER.target().request(APPLICATION_JSON_TYPE).get(String.class);
 
-        JolokiaResponse response = JsonbBuilder.create().fromJson(string, JolokiaResponse.class);
+        JolokiaResponse response = JSONB.fromJson(string, JolokiaResponse.class);
 
         response.assertCurrent();
     }

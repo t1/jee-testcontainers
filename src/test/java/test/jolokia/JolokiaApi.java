@@ -1,6 +1,6 @@
 package test.jolokia;
 
-import javax.ws.rs.GET;
+import jakarta.ws.rs.GET;
 
 public interface JolokiaApi {
     // Jolokia returns Content-Type `text/plain`, even when it's json :-(

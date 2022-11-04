@@ -9,9 +9,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import test.jolokia.JolokiaApi;
 import test.jolokia.JolokiaResponse;
 
-import javax.json.bind.JsonbBuilder;
-
 import static org.assertj.core.api.BDDAssertions.then;
+import static test.TestTools.JSONB;
 import static test.jolokia.TestData.VERSION;
 
 @WildFly
@@ -28,7 +27,7 @@ public class Wildfly18IT {
     @Test void shouldGetJolokiaResponse() {
         JolokiaApi jolokia = CONTAINER.restClient(JolokiaApi.class);
 
-        JolokiaResponse response = JsonbBuilder.create().fromJson(jolokia.get(), JolokiaResponse.class);
+        JolokiaResponse response = JSONB.fromJson(jolokia.get(), JolokiaResponse.class);
 
         response.assertCurrent();
         then(response.getValue().getInfo().getProduct()).isEqualTo("WildFly Full");

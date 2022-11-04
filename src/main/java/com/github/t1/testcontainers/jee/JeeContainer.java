@@ -1,6 +1,9 @@
 package com.github.t1.testcontainers.jee;
 
 import com.github.t1.testcontainers.tools.DeployableBuilder;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.slf4j.event.Level;
@@ -9,9 +12,6 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 import java.net.URI;
 import java.nio.file.Path;
 
@@ -23,13 +23,18 @@ import java.nio.file.Path;
 // we don't use the SELF type, as we don't want any JEE container specific config
 @Slf4j
 public abstract class JeeContainer extends GenericContainer<JeeContainer> {
-    static final Client CLIENT = ClientBuilder.newClient();
+    private static Client CLIENT;
     public static final String CONTAINER_SELECTOR_PROPERTY = "jee-testcontainer";
     public static final String FIX_MAIN_PORT_PROPERTY = "testcontainer-with-main-port-bound-to-fixed-port";
     public static final String TESTCONTAINER_REUSE_PROPERTY = "testcontainer-reuse";
 
     public static JeeContainer create() {
-        DockerImageName imageName = imageName();
+        var imageName = System.getProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly");
+        return create(imageName);
+    }
+
+    public static JeeContainer create(String imageNameString) {
+        DockerImageName imageName = DockerImageName.parse(imageNameString);
         String repository = imageName.getRepository();
         String type = (repository.contains("/")) ? repository.split("/", 2)[1] : repository;
         switch (type) {
@@ -45,10 +50,6 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
                 throw new IllegalArgumentException(
                     "unsupported container type '" + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
         }
-    }
-
-    private static DockerImageName imageName() {
-        return DockerImageName.parse(System.getProperty(CONTAINER_SELECTOR_PROPERTY, "wildfly"));
     }
 
     private String containerDeploymentPath;
@@ -126,11 +127,19 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         if (getContainerInfo() == null || getContainerInfo().getState() == null)
             throw new IllegalStateException(
                 "Container is not started. Maybe you forgot the `@Testcontainers` or the `@Container` annotation,");
-        return CLIENT.target(baseUri());
+        return CLIENT().target(baseUri());
+    }
+
+    static Client CLIENT() {
+        if (CLIENT == null)
+            CLIENT = ClientBuilder.newClient();
+        return CLIENT;
     }
 
     public URI baseUri() {
-        return URI.create("http://" + getHost() + ":" + getFirstMappedPort() + "/" + webContext() + "/");
+        var webContext = webContext();
+        return URI.create("http://" + getHost() + ":" + getFirstMappedPort() + "/"
+                          + ((webContext.isEmpty()) ? "" : (webContext + "/")));
     }
 
     public String webContext() {

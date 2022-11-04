@@ -1,22 +1,21 @@
 package com.github.t1.testcontainers.jee;
 
+import jakarta.ws.rs.core.Response;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.github.t1.testcontainers.jee.JeeContainer.CLIENT;
+import static jakarta.ws.rs.core.Response.Status.OK;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Files.notExists;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static javax.ws.rs.core.Response.Status.OK;
 
 @Slf4j
 public abstract class Deployable {
@@ -149,7 +148,7 @@ public abstract class Deployable {
         private void download() {
             log.info("download " + uri + " to " + tempFile);
 
-            try (Response get = CLIENT.target(uri).request().buildGet().invoke()) {
+            try (Response get = JeeContainer.CLIENT().target(uri).request().buildGet().invoke()) {
                 if (get.getStatusInfo() != OK)
                     throw new IllegalStateException("can't download " + uri + ": " + get.getStatus() + " " + get.getStatusInfo());
                 InputStream inputStream = get.readEntity(InputStream.class);

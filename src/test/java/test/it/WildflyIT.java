@@ -2,30 +2,32 @@ package test.it;
 
 import com.github.t1.testcontainers.jee.JeeContainer;
 import com.github.t1.testcontainers.jee.WildflyContainer;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import test.jolokia.JolokiaApi;
-import test.jolokia.JolokiaResponse;
-
-import javax.json.bind.JsonbBuilder;
 
 import static org.assertj.core.api.BDDAssertions.then;
-import static test.jolokia.TestData.VERSION;
+import static test.TestTools.WILDFLY_JAKARTA_VERSION;
+import static test.TestTools.pingWar;
 
 @WildFly
 @Testcontainers
 public class WildflyIT {
-    @Container static JeeContainer CONTAINER = WildflyContainer.create()
-        .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
+    @Container static JeeContainer CONTAINER = WildflyContainer.create(WILDFLY_JAKARTA_VERSION)
+        .withDeployment(pingWar());
 
-    @Test void shouldGetJolokiaResponse() {
-        JolokiaApi jolokia = CONTAINER.restClient(JolokiaApi.class);
+    @Path("/ping")
+    public interface PingApi {
+        @GET String ping();
+    }
 
-        JolokiaResponse response = JsonbBuilder.create().fromJson(jolokia.get(), JolokiaResponse.class);
+    @Test void shouldGetPingResponse() {
+        PingApi ping = CONTAINER.restClient(PingApi.class);
 
-        response.assertCurrent();
-        then(response.getValue().getInfo().getProduct()).isEqualTo("WildFly Full");
-        then(response.getValue().getInfo().getVendor()).isEqualTo("RedHat");
+        String pong = ping.ping();
+
+        then(pong).isEqualTo("default-pong");
     }
 }

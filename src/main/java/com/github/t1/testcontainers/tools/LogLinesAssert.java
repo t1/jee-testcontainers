@@ -50,7 +50,8 @@ public class LogLinesAssert<SELF extends LogLinesAssert<SELF, ACTUAL>, ACTUAL ex
             LogLine next = actual.next();
             if (thread.equals(next.getThread())) filtered.add(next);
         }
-        //noinspection unchecked
-        return new LogLinesAssert<>((ACTUAL) filtered.iterator());
+        @SuppressWarnings("unchecked")
+        var iterator = (ACTUAL) filtered.iterator();
+        return new LogLinesAssert<>(iterator);
     }
 }

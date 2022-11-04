@@ -2,32 +2,30 @@ package test.it;
 
 import com.github.t1.testcontainers.jee.JeeContainer;
 import com.github.t1.testcontainers.jee.WildflyContainer;
+import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import test.jolokia.JolokiaApi;
-import test.jolokia.JolokiaResponse;
-
-import javax.json.bind.JsonbBuilder;
 
 import static com.github.t1.testcontainers.jee.NamedAsMod.namedAs;
+import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.BDDAssertions.then;
-import static test.jolokia.TestData.VERSION;
+import static test.TestTools.WILDFLY_JAKARTA_VERSION;
+import static test.TestTools.pingWar;
 
 @WildFly
 @Testcontainers
 public class WildflyROOTIT {
-    @Container static JeeContainer CONTAINER = WildflyContainer.create()
-        .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war",
-            namedAs("ROOT.war"));
+    @Container static JeeContainer CONTAINER = WildflyContainer.create(WILDFLY_JAKARTA_VERSION)
+        .withDeployment(pingWar(), namedAs("ROOT.war"));
 
-    @Test void shouldGetJolokiaResponse() {
-        JolokiaApi jolokia = CONTAINER.restClient(JolokiaApi.class);
+    @Test void shouldGetRootResponse() {
+        var webTarget = CONTAINER.target().path("/ping");
 
-        JolokiaResponse response = JsonbBuilder.create().fromJson(jolokia.get(), JolokiaResponse.class);
+        Response response = webTarget.request().get();
 
-        response.assertCurrent();
-        then(response.getValue().getInfo().getProduct()).isEqualTo("WildFly Full");
-        then(response.getValue().getInfo().getVendor()).isEqualTo("RedHat");
+        then(webTarget.getUri()).hasPath("/ping");
+        then(response.getStatusInfo()).isEqualTo(OK);
+        then(response.readEntity(String.class)).contains("pong");
     }
 }
