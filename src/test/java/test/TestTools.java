@@ -19,7 +19,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 
 public class TestTools {
     public static final Jsonb JSONB = JsonbBuilder.create();
-    public static final String WILDFLY_JAKARTA_VERSION = "27.0.0.Beta1-jdk17";
+    public static final String WILDFLY_JAKARTA_VERSION = "27.0.0.Final-jdk17";
     public static final String JAKARTA_IMAGE = "wildfly:" + WILDFLY_JAKARTA_VERSION;
 
     public static void withSystemProperty(String property, String value, Executable block) {
