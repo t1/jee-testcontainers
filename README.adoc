@@ -68,8 +68,8 @@ This is often simply the version of the container; e.g. `wildfly:27.0.0.Final`.
 [options="header",cols="15%,15%,40%,30%"]
 |=======================
 | Key | Container | Docker Image | Notes
-| `wildfly` | https://wildfly.org[WildFly] | https://hub.docker.com/repository/docker/rdohna/wildfly[`rdohna/wildfly`] | default container, not an 'official' image on Docker-Hub, but mine
-| `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] | we add `server.xml` with features `javaee-8.0` and `microProfile-3.0`
+| `wildfly` | https://wildfly.org[WildFly] | https://quay.io/repository/wildfly/wildfly[`wildfly/wildfly`] | default container on https://quay.io[`quay.io`]
+| `open-liberty` | https://openliberty.io[Open Liberty] | https://hub.docker.com/_/open-liberty[`open-liberty`] | we add `server.xml` with features `javaee-10.0` and `microProfile-5.0`
 | `tomee` | https://tomee.apache.org[TomEE] | https://hub.docker.com/_/tomee[`tomee`] | Official image
 | `payara` | https://www.payara.fish[Payara] | https://hub.docker.com/r/payara/server-full[`payara`] | not an 'official' image on Docker-Hub
 // TODO support | `glassfish` | https://javaee.github.io/glassfish/[Glassfish] | https://hub.docker.com/_/glassfish[`glassfish`] | deprecated image!

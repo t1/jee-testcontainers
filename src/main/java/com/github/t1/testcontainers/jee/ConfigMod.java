@@ -18,6 +18,9 @@ import static java.nio.file.Files.notExists;
 import static java.nio.file.Files.readAllLines;
 import static java.nio.file.Files.write;
 
+/**
+ * Change the `microprofile-config.properties` to contain a config value... creates the file if necessary
+ */
 @Slf4j
 public @Value class ConfigMod implements Mod {
     public static Mod config(String key, String value) {return new ConfigMod(key, value);}

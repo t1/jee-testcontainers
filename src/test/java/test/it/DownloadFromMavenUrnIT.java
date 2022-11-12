@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import test.jolokia.JolokiaResponse;
+import test.DemoApp;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -16,28 +16,26 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static java.nio.file.FileVisitResult.CONTINUE;
-import static test.TestTools.JSONB;
-import static test.jolokia.TestData.LOCAL_M2;
-import static test.jolokia.TestData.VERSION;
+import static test.TestTools.EE8_IMAGE;
 
 @WildFly
 @Testcontainers
 @Slf4j
-public class GetJolokiaFromLocalMavenIT {
+public class DownloadFromMavenUrnIT {
+    private static final DemoApp APP = DemoApp.EE8;
 
-    @Container static JeeContainer CONTAINER = deleteLocalJolokiaVersionAndCreateJeeContainer();
+    @Container static JeeContainer CONTAINER = deleteLocalVersionAndCreateJeeContainer();
 
-    private static JeeContainer deleteLocalJolokiaVersionAndCreateJeeContainer() {
-        deleteLocalJolokiaVersion(); // this must happen before the container starts
-        return JeeContainer.create()
-            .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
+    private static JeeContainer deleteLocalVersionAndCreateJeeContainer() {
+        deleteLocalVersion(); // this must happen before the container starts
+        return JeeContainer.create(EE8_IMAGE)
+            .withDeployment(APP.urn());
     }
 
     @SneakyThrows(IOException.class)
-    private static void deleteLocalJolokiaVersion() {
-        Path dir = Paths.get(LOCAL_M2, "org/jolokia/jolokia-war-unsecured", VERSION);
+    private static void deleteLocalVersion() {
+        Path dir = Paths.get(APP.localPath());
         if (Files.exists(dir)) {
             log.warn("deleting {}", dir);
             Files.walkFileTree(dir, new SimpleFileVisitor<>() {
@@ -50,11 +48,7 @@ public class GetJolokiaFromLocalMavenIT {
         }
     }
 
-    @Test void shouldGetJolokiaResponse() {
-        String string = CONTAINER.target().request(APPLICATION_JSON_TYPE).get(String.class);
-
-        JolokiaResponse response = JSONB.fromJson(string, JolokiaResponse.class);
-
-        response.assertCurrent();
+    @Test void shouldGetResponse() {
+        APP.check(CONTAINER);
     }
 }

@@ -13,17 +13,7 @@ public class OpenLibertyContainer extends JeeContainer {
 
     private static final String SERVER_PATH = "/opt/ol/wlp/usr/servers/defaultServer";
 
-    /** use {@link #create()} instead */
-    @Deprecated
-    public OpenLibertyContainer() {this((String) null);}
-
-    /** use {@link #create()} instead */
-    @Deprecated
-    public OpenLibertyContainer(String tag) {
-        this(DockerImageName.parse(tagged("open-liberty", tag)));
-    }
-
-    public OpenLibertyContainer(DockerImageName dockerImageName) {
+    OpenLibertyContainer(DockerImageName dockerImageName) {
         super(dockerImageName);
         withContainerDeploymentPath(SERVER_PATH + "/dropins/");
         withCopyToContainer(MountableFile.forClasspathResource("/openliberty_server.xml"), SERVER_PATH + "/server.xml");

@@ -1,23 +1,22 @@
 package test.it;
 
 import com.github.t1.testcontainers.jee.JeeContainer;
-import com.github.t1.testcontainers.jee.PayaraContainer;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import test.DemoApp;
 
-import static org.assertj.core.api.BDDAssertions.then;
+import static test.TestTools.EE8_IMAGE;
 
-@Payara
+@WildFly
 @Testcontainers
-public class PayaraIT {
+public class DownloadFromMavenUrlIT {
     private static final DemoApp APP = DemoApp.EE8;
 
-    @Container static JeeContainer CONTAINER = PayaraContainer.create().withDeployment(APP.urn());
+    @Container static JeeContainer CONTAINER = JeeContainer.create(EE8_IMAGE)
+        .withDeployment(APP.url());
 
     @Test void shouldGetResponse() {
         APP.check(CONTAINER);
-        then(CONTAINER.getDockerImageName()).isEqualTo("payara/server-full:latest");
     }
 }

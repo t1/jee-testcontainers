@@ -22,9 +22,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 
 public class WildflyContainer extends JeeContainer {
+
+    public static final String WILDFLY_HOME = "/opt/jboss/wildfly/";
+
     public static WildflyContainer create() {return create(null);}
 
-    public static WildflyContainer create(String tag) {return create("rdohna/wildfly", tag);}
+    public static WildflyContainer create(String tag) {return create("quay.io/wildfly/wildfly", tag);}
 
     public static WildflyContainer create(String image, String tag) {return new WildflyContainer(DockerImageName.parse(tagged(image, tag)));}
 
@@ -33,26 +36,16 @@ public class WildflyContainer extends JeeContainer {
 
     private final List<Supplier<String>> cli = new ArrayList<>();
 
-    /** use {@link #create()} instead */
-    @Deprecated
-    public WildflyContainer() {this((String) null);}
-
-    /** use {@link #create(String)} instead */
-    @Deprecated
-    public WildflyContainer(String tag) {this("rdohna/wildfly", tag);}
-
-    /** use {@link #create(String, String)} instead */
-    @Deprecated
-    public WildflyContainer(String image, String tag) {this(DockerImageName.parse(tagged(image, tag)));}
-
-    public WildflyContainer(DockerImageName dockerImageName) {
+    WildflyContainer(DockerImageName dockerImageName) {
         super(withRegistry(dockerImageName));
-        withContainerDeploymentPath("/opt/jboss/wildfly/standalone/deployments/");
+        withContainerDeploymentPath(WILDFLY_HOME + "standalone/deployments/");
         waitingFor(new LogMessageWaitStrategy().withRegEx(WAR_DEPLOYED_MESSAGE));
+        // the console should contain everything that the loggers produce
+        cli.add(() -> "/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level,value=ALL)");
     }
 
     private static DockerImageName withRegistry(DockerImageName dockerImageName) {
-        if (!dockerImageName.getUnversionedPart().contains("/")) dockerImageName = dockerImageName.withRegistry("rdohna");
+        if (!dockerImageName.getUnversionedPart().contains("/")) dockerImageName = dockerImageName.withRegistry("quay.io/wildfly");
         return dockerImageName;
     }
 
@@ -107,12 +100,12 @@ public class WildflyContainer extends JeeContainer {
         String containerPath = "/tmp/" + UUID.randomUUID() + ".cli";
         copyFileToContainer(Transferable.of(script.getBytes(UTF_8)), containerPath);
 
-        ExecResult execResult = execInContainer("bin/jboss-cli.sh", "--connect", "--file=" + containerPath);
+        ExecResult execResult = execInContainer(WILDFLY_HOME + "bin/jboss-cli.sh", "--connect", "--file=" + containerPath);
 
         Logger logger = logger();
         logger.debug("start cli: {}", script);
-        if (!execResult.getStdout().isEmpty()) logger.debug(execResult.getStdout());
-        if (!execResult.getStderr().isEmpty()) logger.debug(execResult.getStderr());
+        if (!execResult.getStdout().isEmpty()) logger.debug("start cli stdout: " + execResult.getStdout());
+        if (!execResult.getStderr().isEmpty()) logger.debug("start cli stderr: " + execResult.getStderr());
         logger.debug("cli took {}", Duration.between(start, Instant.now()));
         if (execResult.getExitCode() != 0) {
             throw new RuntimeException("cli failed [" + execResult.getExitCode() + "]");

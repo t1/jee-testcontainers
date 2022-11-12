@@ -2,28 +2,22 @@ package test.it;
 
 import com.github.t1.testcontainers.jee.JeeContainer;
 import com.github.t1.testcontainers.jee.OpenLibertyContainer;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import test.jolokia.JolokiaResponse;
+import test.app.Ping;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static test.TestTools.JSONB;
-import static test.jolokia.TestData.VERSION;
+import static org.assertj.core.api.BDDAssertions.then;
+import static test.TestTools.ping;
+import static test.TestTools.war;
 
-@Disabled("currently fails [https://github.com/t1/jee-testcontainers/issues/28]")
 @OpenLiberty
 @Testcontainers
 public class OpenLibertyIT {
-    @Container static JeeContainer CONTAINER = OpenLibertyContainer.create()
-        .withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:" + VERSION + ":war");
+    @Container static JeeContainer CONTAINER = OpenLibertyContainer.create().withDeployment(war(Ping.class));
 
-    @Test void shouldGetJolokiaResponse() {
-        String string = CONTAINER.target().request(APPLICATION_JSON_TYPE).get(String.class);
-
-        JolokiaResponse response = JSONB.fromJson(string, JolokiaResponse.class);
-
-        response.assertCurrent();
+    @Test void shouldGetResponse() {
+        then(ping(CONTAINER)).isEqualTo("default-pong");
+        then(CONTAINER.getDockerImageName()).isEqualTo("open-liberty:latest");
     }
 }
