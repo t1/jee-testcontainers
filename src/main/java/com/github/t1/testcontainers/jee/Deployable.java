@@ -15,7 +15,7 @@ import static jakarta.ws.rs.core.Response.Status.OK;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Files.notExists;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 public abstract class Deployable {
@@ -110,7 +110,7 @@ public abstract class Deployable {
             ProcessBuilder builder = new ProcessBuilder("mvn", "dependency:get", "-Dartifact=" + gavt)
                 .redirectErrorStream(true);
             Process process = builder.start();
-            boolean inTime = process.waitFor(5, MINUTES);
+            boolean inTime = process.waitFor(60, SECONDS);
             if (!inTime) {
                 throw new RuntimeException("timeout download " + gavt);
             }
