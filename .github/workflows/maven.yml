@@ -18,6 +18,6 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
     - name: Pre-fetch wunderbar.demo.order:2.4.9 # so it's in `~/.m2/repository`
-      run: mvn --batch-mode mvn dependency:get -Dartifact=com.github.t1:wunderbar.demo.order:2.4.9:war
+      run: mvn --batch-mode dependency:get -Dartifact=com.github.t1:wunderbar.demo.order:2.4.9:war
     - name: Build with Maven
       run: mvn --batch-mode --show-version --no-transfer-progress -DCI=GitHub install
