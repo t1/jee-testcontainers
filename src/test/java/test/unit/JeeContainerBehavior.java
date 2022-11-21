@@ -166,7 +166,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldFailToGetDeploymentFromNonMavenUrn() {
-            Throwable throwable = catchThrowable(() -> container.withDeployment("urn:xxx:com.github.t1:wunderbar.demo.order:2.4.9:war"));
+            Throwable throwable = catchThrowable(() -> container.withDeployment("urn:xxx:" + DemoApp.EE8.gav() + ":war"));
 
             then(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("unsupported urn scheme 'xxx'");
@@ -188,8 +188,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldFailToGetDeploymentFromMavenUrnWithExtraElement() {
-            Throwable throwable = catchThrowable(() ->
-                container.withDeployment("urn:mvn:com.github.t1:wunderbar.demo.order:2.4.9:war:xxx"));
+            Throwable throwable = catchThrowable(() -> container.withDeployment(DemoApp.EE8.urn() + ":xxx"));
 
             then(throwable).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");

@@ -7,6 +7,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.assertj.core.api.BDDAssertions.then;
 
 public class DemoApp {
+    // this version is also pre-fetched in `maven.yml`
     public static final DemoApp EE8 = new DemoApp("2.4.9");
 
     public static final String TARGET_PATH = "/opt/jboss/wildfly/standalone/deployments";
