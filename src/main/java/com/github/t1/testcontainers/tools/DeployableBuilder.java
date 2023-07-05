@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.jar.JarOutputStream;
@@ -61,7 +62,10 @@ public class DeployableBuilder {
 
     @SneakyThrows(IOException.class)
     private static void copyClassFile(JarOutputStream jar, String file) {
-        copy(jar, "WEB-INF/classes/" + file, readAllBytes(Paths.get("target/test-classes/" + file)));
+        var path = Paths.get("target/test-classes", file);
+        if (!Files.exists(path))
+            path = Paths.get("target/classes", file);
+        copy(jar, "WEB-INF/classes/" + file, readAllBytes(path));
     }
 
     private static void addBeansXml(JarOutputStream jar) {

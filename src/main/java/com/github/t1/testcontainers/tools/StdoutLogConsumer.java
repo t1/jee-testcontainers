@@ -1,4 +1,4 @@
-package com.github.t1.testcontainers.jee;
+package com.github.t1.testcontainers.tools;
 
 import org.testcontainers.containers.output.OutputFrame;
 

@@ -1,6 +1,7 @@
 package com.github.t1.testcontainers.jee;
 
 import com.github.t1.testcontainers.tools.DeployableBuilder;
+import com.github.t1.testcontainers.tools.StdoutLogConsumer;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;

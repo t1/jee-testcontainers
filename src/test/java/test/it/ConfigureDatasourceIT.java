@@ -34,9 +34,12 @@ public class ConfigureDatasourceIT {
         .withNetwork(NETWORK)
         .withNetworkAliases("db");
 
-    @Container static JeeContainer APP = JeeContainer.create("rdohna/wildfly:27.0-jdk17") // quay.io/wildfly/wildfly doesn't contain the postgres drivers
+    @Container
+    static JeeContainer APP = JeeContainer.create("rdohna/wildfly:27.0-jdk17") // quay.io/wildfly/wildfly doesn't contain the postgres drivers
         .withDataSource(DB)
-        .withDeployment(war("ROOT").withClasses(REST.class, DAO.class, PgSettings.class).withPersistenceXml(DATABASE_NAME))
+        .withDeployment(war("ROOT")
+            .withClasses(REST.class, DAO.class, PgSettings.class)
+            .withPersistenceXml(DATABASE_NAME))
         .withNetwork(NETWORK);
 
     @Test void shouldReadFromDataSource() {
