@@ -49,7 +49,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
                 return new PayaraContainer(imageName);
             default:
                 throw new IllegalArgumentException(
-                    "unsupported container type '" + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
+                        "unsupported container type '" + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
         }
     }
 
@@ -96,6 +96,10 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         return withDeployment(URI.create(deployableString), mods);
     }
 
+    public JeeContainer withDeployment(Path path, Mod... mods) {
+        return withDeployment(path.toUri(), mods);
+    }
+
     public JeeContainer withDeployment(URI deployable, Mod... mods) {
         this.deployable = Deployable.create(deployable);
         for (Mod mod : mods)
@@ -127,7 +131,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     public WebTarget target() {
         if (getContainerInfo() == null || getContainerInfo().getState() == null)
             throw new IllegalStateException(
-                "Container is not started. Maybe you forgot the `@Testcontainers` or the `@Container` annotation,");
+                    "Container is not started. Maybe you forgot the `@Testcontainers` or the `@Container` annotation,");
         return CLIENT().target(baseUri());
     }
 
@@ -140,7 +144,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     public URI baseUri() {
         var webContext = webContext();
         return URI.create("http://" + getHost() + ":" + getFirstMappedPort() + "/"
-                          + ((webContext.isEmpty()) ? "" : (webContext + "/")));
+                + ((webContext.isEmpty()) ? "" : (webContext + "/")));
     }
 
     public String webContext() {
@@ -152,7 +156,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
 
     public <T> T restClient(Class<T> type) {
         return RestClientBuilder.newBuilder()
-            .baseUri(baseUri())
-            .build(type);
+                .baseUri(baseUri())
+                .build(type);
     }
 }
