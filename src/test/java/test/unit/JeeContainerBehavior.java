@@ -1,16 +1,11 @@
 package test.unit;
 
-import com.github.t1.testcontainers.jee.JeeContainer;
-import com.github.t1.testcontainers.jee.OpenLibertyContainer;
-import com.github.t1.testcontainers.jee.PayaraContainer;
-import com.github.t1.testcontainers.jee.TomEeContainer;
-import com.github.t1.testcontainers.jee.WildflyContainer;
+import com.github.t1.testcontainers.jee.*;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.utility.MountableFile;
 import test.DemoApp;
-import test.TestTools;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,9 +14,7 @@ import java.util.zip.ZipFile;
 
 import static com.github.t1.testcontainers.jee.AddLibMod.addLib;
 import static com.github.t1.testcontainers.jee.ConfigMod.config;
-import static com.github.t1.testcontainers.jee.JeeContainer.CONTAINER_SELECTOR_PROPERTY;
-import static com.github.t1.testcontainers.jee.JeeContainer.FIX_MAIN_PORT_PROPERTY;
-import static com.github.t1.testcontainers.jee.JeeContainer.TESTCONTAINER_REUSE_PROPERTY;
+import static com.github.t1.testcontainers.jee.JeeContainer.*;
 import static com.github.t1.testcontainers.jee.NamedAsMod.namedAs;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -38,8 +31,8 @@ public class JeeContainerBehavior {
             Throwable throwable = catchThrowable(container::target);
 
             then(throwable)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageStartingWith("Container is not started.");
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageStartingWith("Container is not started.");
         }
 
         @Test void shouldNotConfigureTestcontainerReuseByDefault() {
@@ -65,7 +58,7 @@ public class JeeContainerBehavior {
 
             JeeContainer container = JeeContainer.create().withPortBoundToFixedPort(port, 9990);
 
-            then(TestTools.portBindings(container)).containsExactly(port + ":9990/tcp");
+            then(container.getPortBindings()).containsExactly(port + ":9990/tcp");
         }
 
         @Test void shouldConfigureTestcontainerFixedMainPortByWithMethod() {
@@ -73,7 +66,7 @@ public class JeeContainerBehavior {
 
             JeeContainer container = JeeContainer.create().withMainPortBoundToFixedPort(port);
 
-            then(TestTools.portBindings(container)).containsExactly(port + ":8080/tcp");
+            then(container.getPortBindings()).containsExactly(port + ":8080/tcp");
         }
 
         @Test void shouldConfigureTestcontainerFixedMainPortBySystemProperty() {
@@ -81,7 +74,7 @@ public class JeeContainerBehavior {
             withSystemProperty(FIX_MAIN_PORT_PROPERTY, port.toString(), () -> {
                 JeeContainer container = JeeContainer.create();
 
-                then(TestTools.portBindings(container)).containsExactly(port + ":8080/tcp");
+                then(container.getPortBindings()).containsExactly(port + ":8080/tcp");
             });
         }
     }
@@ -150,7 +143,7 @@ public class JeeContainerBehavior {
                 Throwable throwable = catchThrowable(JeeContainer::create);
 
                 then(throwable).isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("unsupported container type 'unknown'");
+                        .hasMessage("unsupported container type 'unknown'");
             });
         }
     }
@@ -169,15 +162,15 @@ public class JeeContainerBehavior {
             Throwable throwable = catchThrowable(() -> container.withDeployment("urn:xxx:" + DemoApp.EE8.gav() + ":war"));
 
             then(throwable).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("unsupported urn scheme 'xxx'");
+                    .hasMessage("unsupported urn scheme 'xxx'");
         }
 
         @Test void shouldFailToGetDeploymentFromMavenUrnWithoutVersion() {
             Throwable throwable = catchThrowable(() ->
-                container.withDeployment("urn:mvn:com.github.t1:wunderbar.demo.order"));
+                    container.withDeployment("urn:mvn:com.github.t1:wunderbar.demo.order"));
 
             then(throwable).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
+                    .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
         }
 
         @Test void shouldGetJarDeploymentFromMavenUrnWithoutType() {
@@ -191,7 +184,7 @@ public class JeeContainerBehavior {
             Throwable throwable = catchThrowable(() -> container.withDeployment(DemoApp.EE8.urn() + ":xxx"));
 
             then(throwable).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
+                    .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
         }
 
         @Test void shouldModifyName() {
@@ -205,78 +198,78 @@ public class JeeContainerBehavior {
 
         @Test void shouldAddOneLibrary() {
             container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:1.7.1:war",
-                addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"));
+                    addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"));
 
             then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH + "/jolokia-war-unsecured.war");
             then(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
-                "META-INF/",
-                "META-INF/MANIFEST.MF",
-                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
-                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.xml",
-                "WEB-INF/",
-                "WEB-INF/classes/",
-                "WEB-INF/lib/",
-                "WEB-INF/lib/jolokia-core-1.7.1.jar",
-                "WEB-INF/lib/jolokia-jsr160-1.7.1.jar",
-                "WEB-INF/lib/json-simple-1.1.1.jar",
-                "WEB-INF/lib/slf4j-api-1.7.30.jar",
-                "WEB-INF/web.xml"
+                    "META-INF/",
+                    "META-INF/MANIFEST.MF",
+                    "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
+                    "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.xml",
+                    "WEB-INF/",
+                    "WEB-INF/classes/",
+                    "WEB-INF/lib/",
+                    "WEB-INF/lib/jolokia-core-1.7.1.jar",
+                    "WEB-INF/lib/jolokia-jsr160-1.7.1.jar",
+                    "WEB-INF/lib/json-simple-1.1.1.jar",
+                    "WEB-INF/lib/slf4j-api-1.7.30.jar",
+                    "WEB-INF/web.xml"
             );
         }
 
         @Test void shouldAddOneLibraryToJarWithoutLibraries() {
             container.withDeployment("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar",
-                addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
+                    addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
 
             then(copyToTransferableContainerPathMap(container))
-                .containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
+                    .containsValues("/opt/jboss/wildfly/standalone/deployments/slf4j-api.jar");
             then(filesInZip(getMountableFile().getResolvedPath())).contains(
-                "WEB-INF/lib/slf4j-jdk14-1.7.30.jar"
+                    "WEB-INF/lib/slf4j-jdk14-1.7.30.jar"
             );
         }
 
         @Test void shouldAddTwoLibraries() {
             container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:1.7.1:war",
-                addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"),
-                addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
+                    addLib("urn:mvn:org.slf4j:slf4j-api:1.7.30:jar"),
+                    addLib("urn:mvn:org.slf4j:slf4j-jdk14:1.7.30:jar"));
 
             then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH + "/jolokia-war-unsecured.war");
             then(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
-                "META-INF/",
-                "META-INF/MANIFEST.MF",
-                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
-                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.xml",
-                "WEB-INF/",
-                "WEB-INF/classes/",
-                "WEB-INF/lib/",
-                "WEB-INF/lib/jolokia-core-1.7.1.jar",
-                "WEB-INF/lib/jolokia-jsr160-1.7.1.jar",
-                "WEB-INF/lib/json-simple-1.1.1.jar",
-                "WEB-INF/lib/slf4j-api-1.7.30.jar",
-                "WEB-INF/lib/slf4j-jdk14-1.7.30.jar",
-                "WEB-INF/web.xml"
+                    "META-INF/",
+                    "META-INF/MANIFEST.MF",
+                    "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
+                    "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.xml",
+                    "WEB-INF/",
+                    "WEB-INF/classes/",
+                    "WEB-INF/lib/",
+                    "WEB-INF/lib/jolokia-core-1.7.1.jar",
+                    "WEB-INF/lib/jolokia-jsr160-1.7.1.jar",
+                    "WEB-INF/lib/json-simple-1.1.1.jar",
+                    "WEB-INF/lib/slf4j-api-1.7.30.jar",
+                    "WEB-INF/lib/slf4j-jdk14-1.7.30.jar",
+                    "WEB-INF/web.xml"
             );
         }
 
         @Test void shouldAddOneConfig() {
             container.withDeployment("urn:mvn:org.jolokia:jolokia-war-unsecured:1.7.1:war",
-                config("foo", "bar"));
+                    config("foo", "bar"));
 
             then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH + "/jolokia-war-unsecured.war");
             then(filesInZip(getMountableFile().getResolvedPath())).containsExactly(
-                "META-INF/",
-                "META-INF/MANIFEST.MF",
-                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
-                "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.xml",
-                "WEB-INF/",
-                "WEB-INF/classes/",
-                "WEB-INF/classes/META-INF/",
-                "WEB-INF/classes/META-INF/microprofile-config.properties",
-                "WEB-INF/lib/",
-                "WEB-INF/lib/jolokia-core-1.7.1.jar",
-                "WEB-INF/lib/jolokia-jsr160-1.7.1.jar",
-                "WEB-INF/lib/json-simple-1.1.1.jar",
-                "WEB-INF/web.xml"
+                    "META-INF/",
+                    "META-INF/MANIFEST.MF",
+                    "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.properties",
+                    "META-INF/maven/org.jolokia/jolokia-war-unsecured/pom.xml",
+                    "WEB-INF/",
+                    "WEB-INF/classes/",
+                    "WEB-INF/classes/META-INF/",
+                    "WEB-INF/classes/META-INF/microprofile-config.properties",
+                    "WEB-INF/lib/",
+                    "WEB-INF/lib/jolokia-core-1.7.1.jar",
+                    "WEB-INF/lib/jolokia-jsr160-1.7.1.jar",
+                    "WEB-INF/lib/json-simple-1.1.1.jar",
+                    "WEB-INF/web.xml"
             );
         }
     }
@@ -303,7 +296,7 @@ public class JeeContainerBehavior {
             Throwable throwable = catchThrowable(() -> container.withDeployment(url));
 
             then(throwable).isInstanceOf(IllegalStateException.class)
-                .hasMessage("can't download " + url + ": 404 Not Found");
+                    .hasMessage("can't download " + url + ": 404 Not Found");
         }
 
         @Test void shouldModifyName() {
