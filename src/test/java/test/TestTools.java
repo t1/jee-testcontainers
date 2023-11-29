@@ -6,14 +6,11 @@ import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.function.Executable;
-import org.testcontainers.containers.GenericContainer;
 import test.app.PingApi;
 import test.app.REST;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.ServerSocket;
-import java.util.List;
 
 import static java.util.Locale.ROOT;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -48,15 +45,6 @@ public class TestTools {
             then(serverSocket.getLocalPort()).isGreaterThan(0);
             return serverSocket.getLocalPort();
         }
-    }
-
-    @SneakyThrows(ReflectiveOperationException.class)
-    public static List<String> portBindings(GenericContainer<?> container) {
-        Field portBindings = GenericContainer.class.getDeclaredField("portBindings");
-        portBindings.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        var strings = (List<String>) portBindings.get(container);
-        return strings;
     }
 
     public static DeployableBuilder war(Class<?> mainClass) {
