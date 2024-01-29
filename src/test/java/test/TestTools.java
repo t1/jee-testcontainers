@@ -17,9 +17,6 @@ import static org.assertj.core.api.BDDAssertions.then;
 
 public class TestTools {
     public static final Jsonb JSONB = JsonbBuilder.create();
-    public static final String WILDFLY_IMAGE = "rdohna/wildfly";
-    public static final String WILDFLY_VERSION = "26.1-jdk11";
-    public static final String EE8_IMAGE = WILDFLY_IMAGE + ":" + WILDFLY_VERSION;
 
     public static void withSystemProperty(String property, String value, Executable block) {
         String oldValue = System.getProperty(property);
@@ -49,8 +46,8 @@ public class TestTools {
 
     public static DeployableBuilder war(Class<?> mainClass) {
         return DeployableBuilder
-            .war(mainClass.getSimpleName().toLowerCase(ROOT))
-            .withClasses(mainClass, REST.class);
+                .war(mainClass.getSimpleName().toLowerCase(ROOT))
+                .withClasses(mainClass, REST.class);
     }
 
     public static String ping(JeeContainer container) {

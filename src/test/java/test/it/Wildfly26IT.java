@@ -7,16 +7,14 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import test.DemoApp;
 
-import static test.TestTools.WILDFLY_IMAGE;
-import static test.TestTools.WILDFLY_VERSION;
-
+/** 26.x was the last EE8 container, i.e. still with <code>javax</code> packages and not yet <code>jakarta</code> */
 @WildFly
 @Testcontainers
 public class Wildfly26IT {
     private static final DemoApp APP = DemoApp.EE8;
 
-    @Container static JeeContainer CONTAINER = WildflyContainer.create(WILDFLY_IMAGE, WILDFLY_VERSION)
-        .withDeployment(APP.urn());
+    @Container static JeeContainer CONTAINER = WildflyContainer.create("rdohna/wildfly", "26.1-jdk11")
+            .withDeployment(APP.urn());
 
     @Test void shouldGetResponse() {
         APP.check(CONTAINER);

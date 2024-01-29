@@ -9,28 +9,22 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import test.DemoApp;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
-import static test.TestTools.EE8_IMAGE;
 
 @WildFly
 @Testcontainers
 @Slf4j
 public class DownloadFromMavenUrnIT {
-    private static final DemoApp APP = DemoApp.EE8;
+    private static final DemoApp APP = DemoApp.LATEST;
 
     @Container static JeeContainer CONTAINER = deleteLocalVersionAndCreateJeeContainer();
 
     private static JeeContainer deleteLocalVersionAndCreateJeeContainer() {
         deleteLocalVersion(); // this must happen before the container starts
-        return JeeContainer.create(EE8_IMAGE)
-            .withDeployment(APP.urn());
+        return JeeContainer.create().withDeployment(APP.urn());
     }
 
     @SneakyThrows(IOException.class)

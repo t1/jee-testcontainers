@@ -150,16 +150,16 @@ public class JeeContainerBehavior {
 
     @Nested class MavenUrn {
         @Test void shouldGetDeploymentFromMavenUrn() {
-            var app = DemoApp.EE8;
+            var app = DemoApp.LATEST;
             container.withDeployment(app.urn());
 
-            then(container.webContext()).isEqualTo(app.id());
+            then(container.webContext()).isEqualTo(app.artifactId());
             then(copyToTransferableContainerPathMap(container)).containsValues(app.targetPath());
             then(getMountableFile().getResolvedPath()).isEqualTo(app.localPath());
         }
 
         @Test void shouldFailToGetDeploymentFromNonMavenUrn() {
-            Throwable throwable = catchThrowable(() -> container.withDeployment("urn:xxx:" + DemoApp.EE8.gav() + ":war"));
+            Throwable throwable = catchThrowable(() -> container.withDeployment("urn:xxx:" + DemoApp.LATEST.gav() + ":war"));
 
             then(throwable).isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("unsupported urn scheme 'xxx'");
@@ -167,7 +167,7 @@ public class JeeContainerBehavior {
 
         @Test void shouldFailToGetDeploymentFromMavenUrnWithoutVersion() {
             Throwable throwable = catchThrowable(() ->
-                    container.withDeployment("urn:mvn:com.github.t1:wunderbar.demo.order"));
+                    container.withDeployment("urn:mvn:" + DemoApp.LATEST.groupId() + ":" + DemoApp.LATEST.artifactId()));
 
             then(throwable).isInstanceOf(IllegalArgumentException.class)
                     .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
@@ -181,14 +181,14 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldFailToGetDeploymentFromMavenUrnWithExtraElement() {
-            Throwable throwable = catchThrowable(() -> container.withDeployment(DemoApp.EE8.urn() + ":xxx"));
+            Throwable throwable = catchThrowable(() -> container.withDeployment(DemoApp.LATEST.urn() + ":xxx"));
 
             then(throwable).isInstanceOf(IllegalArgumentException.class)
                     .hasMessageStartingWith("expected 4 or 5 elements in 'mvn' urn");
         }
 
         @Test void shouldModifyName() {
-            var app = DemoApp.EE8;
+            var app = DemoApp.LATEST;
             container.withDeployment(app.urn(), namedAs("foo.war"));
 
             then(container.webContext()).isEqualTo("foo");
@@ -283,7 +283,7 @@ public class JeeContainerBehavior {
 
     @Nested class MavenCentralUrl {
         @Test void shouldGetDeploymentFromMavenCentralUrl() {
-            var app = DemoApp.EE8;
+            var app = DemoApp.LATEST;
             container.withDeployment(app.url());
 
             then(container.webContext()).isEqualTo(app.id_v());
@@ -292,7 +292,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldFailToGetDeploymentFromMavenUrlNotDownloadable() {
-            String url = DemoApp.EE8.url() + "x";
+            String url = DemoApp.LATEST.url() + "x";
             Throwable throwable = catchThrowable(() -> container.withDeployment(url));
 
             then(throwable).isInstanceOf(IllegalStateException.class)
@@ -300,7 +300,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldModifyName() {
-            container.withDeployment(DemoApp.EE8.url(), namedAs("foo.war"));
+            container.withDeployment(DemoApp.LATEST.url(), namedAs("foo.war"));
 
             then(container.webContext()).isEqualTo("foo");
             then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH + "/foo.war");
@@ -318,7 +318,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldGetDeploymentFromLocalFileUrl() {
-            var app = DemoApp.EE8;
+            var app = DemoApp.LATEST;
             container.withDeployment(app.file());
 
             then(container.webContext()).isEqualTo(app.id_v());
@@ -343,7 +343,7 @@ public class JeeContainerBehavior {
         }
 
         @Test void shouldModifyName() {
-            container.withDeployment(DemoApp.EE8.urn(), namedAs("foo.war"));
+            container.withDeployment(DemoApp.LATEST.urn(), namedAs("foo.war"));
 
             then(container.webContext()).isEqualTo("foo");
             then(copyToTransferableContainerPathMap(container)).containsValues(TARGET_PATH + "/foo.war");
