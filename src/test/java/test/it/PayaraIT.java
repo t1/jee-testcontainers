@@ -12,7 +12,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 @Payara
 @Testcontainers
 public class PayaraIT {
-    private static final DemoApp APP = DemoApp.EE8;
+    private static final DemoApp APP = DemoApp.LATEST;
 
     @Container static JeeContainer CONTAINER = PayaraContainer.create().withDeployment(APP.urn());
 

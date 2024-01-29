@@ -18,10 +18,7 @@ import static jakarta.ws.rs.client.Entity.json;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.assertj.core.api.BDDAssertions.then;
-import static test.TestTools.EE8_IMAGE;
-import static test.TestTools.JSONB;
-import static test.TestTools.ping;
-import static test.TestTools.war;
+import static test.TestTools.*;
 
 @Slf4j
 @WildFly
@@ -30,7 +27,7 @@ public class SetConfigPropertyIT {
 
     @Nested class UnConfigured {
         @Container JeeContainer UN_CONFIGURED_PING = JeeContainer.create()
-            .withDeployment(war(Ping.class));
+                .withDeployment(war(Ping.class));
 
         @Test void shouldPingUnConfigured() {
             then(ping(UN_CONFIGURED_PING)).isEqualTo("default-pong");
@@ -40,7 +37,7 @@ public class SetConfigPropertyIT {
 
     @Nested class Configured {
         @Container JeeContainer CONFIGURED_PING = JeeContainer.create()
-            .withDeployment(war(Ping.class), config("pong", "foo"));
+                .withDeployment(war(Ping.class), config("pong", "foo"));
 
         @Test void shouldCreateNewConfig() {
             then(ping(CONFIGURED_PING)).isEqualTo("foo");
@@ -49,8 +46,8 @@ public class SetConfigPropertyIT {
 
 
     @Nested class ConfigAppend {
-        @Container JeeContainer DEMO = JeeContainer.create(EE8_IMAGE)
-            .withDeployment(DemoApp.EE8.urn(), config("smallrye.graphql.errorExtensionFields", "exception")); // this app also contains `code` -> overwrite
+        @Container JeeContainer DEMO = JeeContainer.create()
+                .withDeployment(DemoApp.LATEST.urn(), config("smallrye.graphql.errorExtensionFields", "exception")); // this app also contains `code` -> overwrite
 
         @Test void shouldAppendToExistingConfig() {
             Builder request = DEMO.target().path("/graphql").request(APPLICATION_JSON_TYPE);
@@ -60,8 +57,8 @@ public class SetConfigPropertyIT {
                 log.info("response: {}", jsonObject);
                 then(jsonObject.getValue("/errors/0/message")).isEqualTo(Json.createValue("no order with id unknown"));
                 then(jsonObject.getValue("/errors/0/extensions").asJsonObject().keySet())
-                    .describedAs("this MP config options should have been overwritten")
-                    .containsExactly("exception");
+                        .describedAs("this MP config options should have been overwritten")
+                        .containsExactly("exception");
             }
         }
     }

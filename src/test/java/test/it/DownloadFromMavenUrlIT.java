@@ -6,15 +6,13 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import test.DemoApp;
 
-import static test.TestTools.EE8_IMAGE;
-
 @WildFly
 @Testcontainers
 public class DownloadFromMavenUrlIT {
-    private static final DemoApp APP = DemoApp.EE8;
+    private static final DemoApp APP = DemoApp.LATEST;
 
-    @Container static JeeContainer CONTAINER = JeeContainer.create(EE8_IMAGE)
-        .withDeployment(APP.url());
+    @Container static JeeContainer CONTAINER = JeeContainer.create()
+            .withDeployment(APP.url());
 
     @Test void shouldGetResponse() {
         APP.check(CONTAINER);
