@@ -214,7 +214,7 @@
         <dependency>
             <groupId>io.smallrye.config</groupId>
             <artifactId>smallrye-config</artifactId>
-            <version>3.6.0</version>
+            <version>3.6.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
