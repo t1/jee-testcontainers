@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <maven-test-plugins.version>3.2.5</maven-test-plugins.version>
+        <maven-test-plugins.version>3.3.0</maven-test-plugins.version>
         <org.testcontainers.version>1.19.8</org.testcontainers.version>
     </properties>
 
