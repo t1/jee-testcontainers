@@ -208,7 +208,7 @@
         <dependency>
             <groupId>org.jboss.resteasy.microprofile</groupId>
             <artifactId>microprofile-rest-client</artifactId>
-            <version>2.1.5.Final</version>
+            <version>3.0.0.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
