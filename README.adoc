@@ -54,7 +54,11 @@ The console output of the container is piped to the test's output, STDOUT in gre
 As seen in the prototypical example above, you can install an application by calling `.withDeployment(<file>)`.
 
 Instead of a local file, you can also install from an URL.
+
 Or you can use a maven URN like `urn:mvn:org.jolokia:jolokia-war-unsecured:1.6.3:war`.
+
+Finally, you can also build your deployment manually, by adding the classes and other files you want included.
+For some details, see below.
 
 == Container Image
 
