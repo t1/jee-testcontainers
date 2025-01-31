@@ -45,7 +45,8 @@ public class WildflyContainer extends JeeContainer {
     }
 
     private static DockerImageName withRegistry(DockerImageName dockerImageName) {
-        if (!dockerImageName.getUnversionedPart().contains("/")) dockerImageName = dockerImageName.withRegistry("quay.io/wildfly");
+        if (!dockerImageName.getUnversionedPart().contains("/"))
+            dockerImageName = dockerImageName.withRegistry("quay.io/wildfly");
         return dockerImageName;
     }
 
@@ -74,12 +75,10 @@ public class WildflyContainer extends JeeContainer {
 
     private String driver(JdbcDatabaseContainer<?> db) {
         //noinspection SwitchStatementWithTooFewBranches
-        switch (db.getDriverClassName()) {
-            case "org.postgresql.Driver":
-                return "postgresql";
-            default:
-                throw new RuntimeException("unknown driver class name: " + db.getDriverClassName());
-        }
+        return switch (db.getDriverClassName()) {
+            case "org.postgresql.Driver" -> "postgresql";
+            default -> throw new RuntimeException("unknown driver class name: " + db.getDriverClassName());
+        };
     }
 
     public WildflyContainer withCli(String command) {
@@ -104,8 +103,8 @@ public class WildflyContainer extends JeeContainer {
 
         Logger logger = logger();
         logger.debug("start cli: {}", script);
-        if (!execResult.getStdout().isEmpty()) logger.debug("start cli stdout: " + execResult.getStdout());
-        if (!execResult.getStderr().isEmpty()) logger.debug("start cli stderr: " + execResult.getStderr());
+        if (!execResult.getStdout().isEmpty()) logger.debug("start cli stdout: {}", execResult.getStdout());
+        if (!execResult.getStderr().isEmpty()) logger.debug("start cli stderr: {}", execResult.getStderr());
         logger.debug("cli took {}", Duration.between(start, Instant.now()));
         if (execResult.getExitCode() != 0) {
             throw new RuntimeException("cli failed [" + execResult.getExitCode() + "]");

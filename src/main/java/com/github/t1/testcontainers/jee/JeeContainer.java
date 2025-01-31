@@ -38,19 +38,14 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
         DockerImageName imageName = DockerImageName.parse(imageNameString);
         String repository = imageName.getRepository();
         String type = (repository.contains("/")) ? repository.split("/", 2)[1] : repository;
-        switch (type) {
-            case "wildfly":
-                return new WildflyContainer(imageName);
-            case "open-liberty":
-                return new OpenLibertyContainer(imageName);
-            case "tomee":
-                return new TomEeContainer(imageName);
-            case "payara":
-                return new PayaraContainer(imageName);
-            default:
-                throw new IllegalArgumentException(
-                        "unsupported container type '" + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
-        }
+        return switch (type) {
+            case "wildfly" -> new WildflyContainer(imageName);
+            case "open-liberty" -> new OpenLibertyContainer(imageName);
+            case "tomee" -> new TomEeContainer(imageName);
+            case "payara" -> new PayaraContainer(imageName);
+            default -> throw new IllegalArgumentException(
+                    "unsupported container type '" + System.getProperty(CONTAINER_SELECTOR_PROPERTY) + "'");
+        };
     }
 
     private String containerDeploymentPath;
@@ -144,7 +139,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     public URI baseUri() {
         var webContext = webContext();
         return URI.create("http://" + getHost() + ":" + getFirstMappedPort() + "/"
-                + ((webContext.isEmpty()) ? "" : (webContext + "/")));
+                          + ((webContext.isEmpty()) ? "" : (webContext + "/")));
     }
 
     public String webContext() {
