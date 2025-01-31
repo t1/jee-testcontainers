@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.t1</groupId>
     <artifactId>jee-testcontainers</artifactId>
-    <version>2.2.5-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <name>jee-testcontainers</name>
     <description>testcontainers.org for Jakarta EE application servers</description>
     <url>https://github.com/t1/jee-testcontainers</url>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -238,7 +239,14 @@
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-shaded</artifactId>
-            <version>5.1.5.Final</version>
+            <version>6.0.0.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <!--force newer version-->
+        <dependency>
+            <artifactId>jboss-logging</artifactId>
+            <groupId>org.jboss.logging</groupId>
+            <version>3.6.1.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>

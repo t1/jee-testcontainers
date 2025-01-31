@@ -158,3 +158,9 @@ I will add such things whenever I need it, but again: PRs are welcome.
 There's a very limited support to build a `war` deployable from scratch.
 See the API of the https://github.com/t1/jee-testcontainers/blob/trunk/src/main/java/com/github/t1/testcontainers/tools/DeployableBuilder.java[DeployableBuilder] class for details.
 If you need more, maybe https://github.com/shrinkwrap/shrinkwrap[ShrinkWrap] can help, but I haven't tried that in combination, yet.
+
+== Breaking Changes (Major Versions)
+
+=== 3.0.0
+
+* Drop support for Java 11, because JEE 11 and the libraries used for JEE 11 (e.g. Smallrye Config) require Java 17.
