@@ -239,7 +239,7 @@
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-shaded</artifactId>
-            <version>6.0.0.Final</version>
+            <version>6.0.1.Final</version>
             <scope>test</scope>
         </dependency>
         <!--force newer version-->
