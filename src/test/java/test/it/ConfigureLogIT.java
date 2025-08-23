@@ -21,19 +21,19 @@ import static test.TestTools.war;
 public class ConfigureLogIT {
 
     @Container static JeeContainer CONTAINER = JeeContainer.create()
-        .withDeployment(war(Ping.class))
-        .withLogLevel(Ping.class, DEBUG);
+            .withDeployment(war(Ping.class))
+            .withLogLevel(Ping.class, DEBUG);
 
     @Test void shouldLogInfo() {
         then(ping(CONTAINER)).isEqualTo("default-pong");
         then(CONTAINER.target().path("/x").getUri()).hasPath("/ping/x");
         thenLogsIn(CONTAINER).hasFollowingMessage("got pinged");
         thenLogsIn(CONTAINER).hasFollowing(LogLine.message("got pinged")
-            .withLevel(INFO)
-            .withLogger(Ping.class.getName())
-            .withThread("default task-1"));
-        thenLogsIn(CONTAINER).thread("default task-1")
-            .hasFollowingMessage("got pinged");
+                .withLevel(INFO)
+                .withLogger(Ping.class.getName())
+                .withThread("default task-2"));
+        thenLogsIn(CONTAINER).thread("default task-2")
+                .hasFollowingMessage("got pinged");
     }
 
     @Test void shouldNotLogTrace() {

@@ -35,9 +35,9 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     }
 
     public static JeeContainer create(String imageNameString) {
-        DockerImageName imageName = DockerImageName.parse(imageNameString);
-        String repository = imageName.getRepository();
-        String type = (repository.contains("/")) ? repository.split("/", 2)[1] : repository;
+        var imageName = DockerImageName.parse(imageNameString);
+        var repository = imageName.getRepository();
+        var type = (repository.contains("/")) ? repository.split("/", 2)[1] : repository;
         return switch (type) {
             case "wildfly" -> new WildflyContainer(imageName);
             case "open-liberty" -> new OpenLibertyContainer(imageName);
@@ -97,9 +97,9 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
 
     public JeeContainer withDeployment(URI deployable, Mod... mods) {
         this.deployable = Deployable.create(deployable);
-        for (Mod mod : mods)
+        for (var mod : mods)
             this.deployable = mod.apply(this.deployable);
-        Path localPath = this.deployable.getLocalPath();
+        var localPath = this.deployable.getLocalPath();
         log.info("deploy {} to {}", localPath, containerPath());
         withCopyToContainer(MountableFile.forHostPath(localPath), containerPath());
         return self();
@@ -143,7 +143,7 @@ public abstract class JeeContainer extends GenericContainer<JeeContainer> {
     }
 
     public String webContext() {
-        String fileName = deployable.getFileName();
+        var fileName = deployable.getFileName();
         if (fileName.endsWith(".war") || fileName.endsWith(".ear"))
             fileName = fileName.substring(0, fileName.length() - 4);
         return fileName;
