@@ -18,7 +18,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <maven-test-plugins.version>3.5.4</maven-test-plugins.version>
-        <org.testcontainers.version>1.21.4</org.testcontainers.version>
+        <testcontainers.version>2.0.3</testcontainers.version>
+        <lombok.version>1.18.42</lombok.version>
     </properties>
 
     <distributionManagement>
@@ -58,8 +59,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.1</version>
+                <version>3.15.0</version>
                 <configuration>
+                    <parameters>true</parameters>
+                    <proc>full</proc>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
                 </configuration>
             </plugin>
@@ -153,7 +163,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.42</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -172,19 +182,13 @@
 
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${org.testcontainers.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>junit-jupiter-api</artifactId>
-                    <groupId>org.junit.jupiter</groupId>
-                </exclusion>
-            </exclusions>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
+            <version>${testcontainers.version}</version>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${org.testcontainers.version}</version>
+            <artifactId>testcontainers-postgresql</artifactId>
+            <version>${testcontainers.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -215,7 +219,7 @@
         <dependency>
             <groupId>io.smallrye.config</groupId>
             <artifactId>smallrye-config</artifactId>
-            <version>3.15.0</version>
+            <version>3.16.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -233,20 +237,20 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.24</version>
+            <version>1.5.29</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-shaded</artifactId>
-            <version>6.0.3.Final</version>
+            <version>6.0.4.Final</version>
             <scope>test</scope>
         </dependency>
         <!--force newer version-->
         <dependency>
             <artifactId>jboss-logging</artifactId>
             <groupId>org.jboss.logging</groupId>
-            <version>3.6.1.Final</version>
+            <version>3.6.2.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -270,7 +274,7 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <!-- always run source+javadoc (above) => see problems early & source available in local repo -->
+                    <!-- always run source+Javadoc (above) => see problems early & source available in local repo -->
                     <!-- but don't run gpg everywhere, esp. not in GitHub Actions -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

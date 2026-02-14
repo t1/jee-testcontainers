@@ -5,9 +5,9 @@ import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import test.app.DAO;
 import test.app.PgSettings;
 import test.app.REST;
@@ -27,20 +27,19 @@ public class ConfigureDatasourceIT {
 
     static final Network NETWORK = Network.newNetwork();
 
-    @SuppressWarnings("resource")
-    @Container static PostgreSQLContainer<?> DB = new PostgreSQLContainer<>("postgres:" + POSTGRESQL_VERSION)
-        .withDatabaseName(DATABASE_NAME)
-        .withPassword(UUID.randomUUID().toString())
-        .withNetwork(NETWORK)
-        .withNetworkAliases("db");
+    @Container static PostgreSQLContainer DB = new PostgreSQLContainer("postgres:" + POSTGRESQL_VERSION)
+            .withDatabaseName(DATABASE_NAME)
+            .withPassword(UUID.randomUUID().toString())
+            .withNetwork(NETWORK)
+            .withNetworkAliases("db");
 
     @Container
     static JeeContainer APP = JeeContainer.create("rdohna/wildfly:27.0-jdk17") // quay.io/wildfly/wildfly doesn't contain the postgres drivers
-        .withDataSource(DB)
-        .withDeployment(war("ROOT")
-            .withClasses(REST.class, DAO.class, PgSettings.class)
-            .withPersistenceXml(DATABASE_NAME))
-        .withNetwork(NETWORK);
+            .withDataSource(DB)
+            .withDeployment(war("ROOT")
+                    .withClasses(REST.class, DAO.class, PgSettings.class)
+                    .withPersistenceXml(DATABASE_NAME))
+            .withNetwork(NETWORK);
 
     @Test void shouldReadFromDataSource() {
         Response response = APP.target().path("/dao").request().get();
