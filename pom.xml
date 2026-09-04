@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <maven-test-plugins.version>3.5.6</maven-test-plugins.version>
+        <maven-test-plugins.version>3.6.0</maven-test-plugins.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <lombok.version>1.18.48</lombok.version>
     </properties>
